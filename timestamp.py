@@ -36,7 +36,7 @@ class TimestampCommand(sublime_plugin.TextCommand):
             text = self.view.substr(s)
             print(text)
 
-			# 得到转换结果
+            # 得到转换结果
             result = getParseResult(text)
 
             # 进行文本替换并弹窗显示
