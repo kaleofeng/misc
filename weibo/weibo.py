@@ -106,6 +106,40 @@ class Weibo(object):
     def logout(self):
         self.session.close()
 
+    def post(self, content):
+        timestamp = int(time.time()) * 1000
+        url = r'https://weibo.com/aj/mblog/add?ajwvr=6&__rnd=%s' %(timestamp)
+
+        self.headers['Referer'] = r'http://weibo.com/u/%s?wvr=5&lf=reg' %(self.sid)
+
+        data = {
+            'location': 'v6_content_home',
+            'text': content,
+            'appkey': '',
+            'style_type': 1,
+            'pic_id': '',
+            'tid': '',
+            'pdetail': '',
+            'mid': '',
+            'isReEdit': False,
+            'rank': 0,
+            'rankid': '',
+            'module': 'stissue',
+            'pub_source': 'main_',
+            'pub_type': 'dialog',
+            'isPri': 0,
+            '_t': 0
+        }
+
+        # print('--- post req data ---', data, '\n')
+
+        rsp = self.session.post(url, data = data, headers = self.headers)
+
+        self.code = int(re.findall('code":"(.*?)"', rsp.text)[0])
+
+        print('--- post rsp code ---', rsp.status_code, self.code, '\n')
+        return self
+
     def follow(self, uid):
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/f/followed?ajwvr=6&__rnd=%s' %(timestamp)

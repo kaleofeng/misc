@@ -9,6 +9,16 @@ import sys
 import util
 import weibo
 
+def doPost(client, content):
+    print('doPost', content, '\n', flush = True)
+
+    client.post(content)
+    ret = client.code == 100000
+    if not ret:
+        print('!!! doPost failed !!!', '\n', flush = True)
+
+    return ret
+
 def doFollow(client, uid):
     print('doFollow', uid, '\n', flush = True) 
 
