@@ -1,0 +1,1 @@
+docker run --name mysql8 -d -p 3306:3306 -v $PWD/data:/var/lib/mysql -v $PWD/conf:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=Root!123456 mysql:latest

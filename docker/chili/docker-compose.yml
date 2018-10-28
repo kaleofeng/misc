@@ -1,0 +1,56 @@
+version: "3"
+services:
+  mysql8:
+    container_name: mysql8
+    image: mysql:latest
+    restart: always
+    volumes:
+      - $PWD/mysql/conf:/etc/mysql/conf.d
+      - $PWD/mysql/data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=Root!123456
+  tomcat_metazion_com:
+    container_name: tomcat_metazion_com
+    image: tomcat:latest
+    restart: always
+    ports:
+      - 8081:8080
+    volumes:
+      - $PWD/tomcat/metazion_com/webapps:/usr/local/tomcat/webapps
+      - $PWD/tomcat/metazion_com/logs:/usr/local/tomcat/logs
+    links:
+      - mysql8:mysql8
+    depends_on:
+      - mysql8
+  tomcat_metazion_net:
+    container_name: tomcat_metazion_net
+    image: tomcat:latest
+    restart: always
+    ports:
+      - 8082:8080
+    volumes:
+      - $PWD/tomcat/metazion_net/webapps:/usr/local/tomcat/webapps
+      - $PWD/tomcat/metazion_net/logs:/usr/local/tomcat/logs
+    links:
+      - mysql8:mysql8
+    depends_on:
+      - mysql8
+  nginx15:
+    container_name: nginx15
+    image: nginx:latest
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - $PWD/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      - $PWD/nginx/html:/var/share/nginx/html
+      - $PWD/nginx/logs:/var/log/nginx
+    links:
+      - tomcat_metazion_com:tomcat_metazion_com
+      - tomcat_metazion_net:tomcat_metazion_net
+    depends_on:
+      - tomcat_metazion_com
+      - tomcat_metazion_net

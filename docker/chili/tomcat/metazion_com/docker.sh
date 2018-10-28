@@ -1,0 +1,1 @@
+docker run --name tomcat_metazion_com -d -p 8081:8080 -v $PWD/webapps:/usr/local/tomcat/webapps -v $PWD/logs:/usr/local/tomcat/logs --link mysql8:mysql8 tomcat:latest 
