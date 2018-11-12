@@ -1,7 +1,7 @@
 version: "3"
 services:
-  mysql8:
-    container_name: mysql8
+  mysql_common:
+    container_name: mysql_common
     image: mysql:8.0.13
     restart: always
     volumes:
@@ -25,7 +25,7 @@ services:
     networks:
       - metazion_web
     depends_on:
-      - mysql8
+      - mysql_common
   tomcat_metazion_net:
     container_name: tomcat_metazion_net
     image: tomcat:8.5.35-jre8
@@ -39,10 +39,10 @@ services:
       - metazion_web
       - metazion_db
     depends_on:
-      - mysql8
-  nginx15:
-    container_name: nginx15
-    image: nginx:latest
+      - mysql_common
+  nginx_common:
+    container_name: nginx_common
+    image: nginx:1.15.6
     restart: always
     ports:
       - 80:80

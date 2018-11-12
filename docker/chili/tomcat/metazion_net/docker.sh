@@ -1,1 +1,1 @@
-docker run --name tomcat_metazion_net -d -p 8082:8080 -v $PWD/webapps:/usr/local/tomcat/webapps -v $PWD/logs:/usr/local/tomcat/logs --link mysql8:mysql8 tomcat:8.5.35-jre8
+docker run --name tomcat_metazion_net -d -p 8082:8080 -v $PWD/webapps:/usr/local/tomcat/webapps -v $PWD/logs:/usr/local/tomcat/logs --link mysql_common:mysql_common tomcat:8.5.35-jre8
