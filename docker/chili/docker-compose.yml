@@ -2,7 +2,7 @@ version: "3"
 services:
   mysql8:
     container_name: mysql8
-    image: mysql:latest
+    image: mysql:8.0.13
     restart: always
     volumes:
       - $PWD/mysql/conf:/etc/mysql/conf.d
@@ -15,7 +15,7 @@ services:
       - metazion_db
   tomcat_metazion_com:
     container_name: tomcat_metazion_com
-    image: tomcat:latest
+    image: tomcat:8.5.35-jre8
     restart: always
     ports:
       - 8081:8080
@@ -28,7 +28,7 @@ services:
       - mysql8
   tomcat_metazion_net:
     container_name: tomcat_metazion_net
-    image: tomcat:latest
+    image: tomcat:8.5.35-jre8
     restart: always
     ports:
       - 8082:8080
