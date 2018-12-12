@@ -20,8 +20,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for album_today
 -- ----------------------------
-DROP TABLE IF EXISTS `album_today`;
-CREATE TABLE `album_today`  (
+DROP TABLE IF EXISTS `tab_album_today`;
+CREATE TABLE `tab_album_today`  (
   `singer` int(11) NOT NULL COMMENT '歌手',
   `rank` int(11) NOT NULL COMMENT '排名',
   `call_num` int(11) NOT NULL COMMENT '购买数量',
@@ -35,8 +35,8 @@ CREATE TABLE `album_today`  (
 -- ----------------------------
 -- Table structure for album_total
 -- ----------------------------
-DROP TABLE IF EXISTS `album_total`;
-CREATE TABLE `album_total`  (
+DROP TABLE IF EXISTS `tab_album_total`;
+CREATE TABLE `tab_album_total`  (
   `singer` int(11) NOT NULL COMMENT '歌手',
   `rank` int(11) NOT NULL COMMENT '排名',
   `call_num` int(11) NOT NULL COMMENT '购买数量',
