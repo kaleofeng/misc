@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50720
 File Encoding         : 65001
 
-Date: 2018-12-12 17:45:06
+Date: 2018-12-12 18:20:17
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -24,6 +24,7 @@ CREATE TABLE `tab_qnews_topstat` (
   `sid` int(10) NOT NULL,
   `sname` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '明星名称',
   `value` int(10) NOT NULL COMMENT '数值',
+  `diff` int(10) NOT NULL COMMENT '差值',
   `time` int(10) NOT NULL COMMENT '时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
