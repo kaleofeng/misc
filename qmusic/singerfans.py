@@ -157,5 +157,5 @@ writeToXls(xlsTotal, singerCallsTotal)
 xlsToday = 'fanstoday_%s_%s.xls' % (singer, statTime)
 writeToXls(xlsToday, singerCallsToday)
 
-writeToDB('album_total', singerCallsTotal)
-writeToDB('album_today', singerCallsToday)
+writeToDB('tab_album_total', singerCallsTotal)
+writeToDB('tab_album_today', singerCallsToday)
