@@ -3,12 +3,12 @@
 #  -*- coding:utf-8 -*-
 
 import io
+import json
+import pymysql
 import sys
 import time
-import urllib.request
 import urllib.parse
-import json
-import xlwt
+import urllib.request
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')
 
@@ -22,8 +22,8 @@ headers = {
 }
 
 params = {
-  'seasonId': 17,
-  'userId': ''
+    'seasonId': 17,
+    'userId': ''
 }
 
 def requestPost(params):
@@ -33,22 +33,46 @@ def requestPost(params):
     result = json.loads(rsp.read().decode('utf-8'))
     return result
 
+def writeIntoFile(fileName, records):
+    jsonFile = open(fileName, 'w')
+    json.dump(records, jsonFile, indent=4)
+    jsonFile.close()
+
+def writeIntoDB(tableName, records):
+    db = pymysql.connect(host ='127.0.0.1', user = 'root', passwd = '123456', db = 'album', charset = 'utf8mb4')
+    cursor = db.cursor()
+
+    now = time.time()
+    
+    for record in records:
+        sql = "REPLACE INTO %s VALUES(0, '%s', '%s', '%s', '%d')" % (tableName, record['id'], record['name'], record['count'], now)
+        try:
+            cursor.execute(sql)
+            db.commit()
+        except:
+            db.rollback()
+            print('Insert record[%s] error!' % record['id'])
+    
+    db.close()
+
+# Crawl data
 result = requestPost(params)
 
+# Filter data
 stats = {}
 stats['list'] = []
 for info in result['data']['list']:
-  stat = {} 
-  stat['id'] = info['id']
-  stat['count'] = info['count']
-  print(stat)
-  stats['list'].append(stat)
+    stat = {} 
+    stat['id'] = info['id']
+    stat['count'] = info['count']
+    stat['name'] = info['name']
+    stats['list'].append(stat)
+    print(stat)
 
-print(json.dumps(stats))
-
+# Write into json file
 statTime = time.strftime('%Y-%m-%d-%H-%M', time.localtime(time.time()))
-jsonName = 'topstat_' + statTime + '.json'
+jsonName = 'qnews_topstat_' + statTime + '.json'
+writeIntoFile(jsonName, stats)
 
-jsonFile = open(jsonName, 'w')
-json.dump(stats, jsonFile, indent=4)
-jsonFile.close()
+# Write into mysql db
+writeIntoDB('tab_qnews_topstat', stats['list'])
