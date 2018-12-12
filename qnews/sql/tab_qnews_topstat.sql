@@ -24,7 +24,7 @@ CREATE TABLE `tab_qnews_topstat` (
   `sid` int(10) NOT NULL,
   `sname` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '明星名称',
   `value` int(10) NOT NULL COMMENT '数值',
-  `diff` int(10) NOT NULL COMMENT '差值',
+  `incr` int(10) NOT NULL COMMENT '增量',
   `time` int(10) NOT NULL COMMENT '时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -45,12 +45,12 @@ def writeIntoDB(tableName, records):
         for r in cursor.fetchall():
             last = r[0]
 
-        # Calculate diff value
-        record['diff'] = record['count'] - last
-        print('sid[%d] current[%d] last[%d] diff[%d]' % (sid, record['count'], last, record['diff']))
+        # Calculate increment
+        record['incr'] = record['count'] - last
+        print('sid[%d] current[%d] last[%d] incr[%d]' % (sid, record['count'], last, record['incr']))
 
         # Insert a new record
-        sql = "INSERT INTO %s VALUES(0, '%d', '%s', '%d', '%d', '%d')" % (tableName, sid, record['name'], record['count'], record['diff'], now)
+        sql = "INSERT INTO %s VALUES(0, '%d', '%s', '%d', '%d', '%d')" % (tableName, sid, record['name'], record['count'], record['incr'], now)
         try:
             cursor.execute(sql)
             db.commit()
