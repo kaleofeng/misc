@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 #  -*- coding:utf-8 -*-
 
@@ -19,17 +18,21 @@ def requestPost(url, headers, params):
     result = json.loads(rsp.read().decode('utf-8'))
     return result
 
-def writeIntoFile(fileName, records):
-    jsonFile = open(fileName, 'w')
+def writeIntoFile(jsonName, records):
+    jsonFile = open(jsonName, 'w')
     json.dump(records, jsonFile, indent=4)
     jsonFile.close()
+    print('Write into json file[%s] done' % jsonName)
 
 def writeIntoDB(tableName, records):
     db = pymysql.connect(host ='127.0.0.1', user = 'root', passwd = '123456', db = 'album', charset = 'utf8mb4')
     cursor = db.cursor()
 
-    now = time.time()
-    
+    # Current time, ingore seconds
+    now = int(time.time())
+    now -= now % 60
+
+    # Write each record
     for record in records:
         sid = record['id']
 
@@ -59,22 +62,20 @@ def writeIntoDB(tableName, records):
             print('Insert record[%d] error!' % sid)
     
     db.close()
+    print('Write into db table[%s] done' % tableName)
 
 # Crawl data
 url = 'http://yc.static.qq.com/?service=App.StarList_ApiStarListsl7.RankingList'
-
 headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
     'Connection': 'close',
     'Referer': 'http://news.qq.com/zt2018/cwei/app.htm?ADTAG=wx.pyq&listid=17&uid=151656&sid=640&have=true&appinstall=0&from=singlemessage&isappinstalled=0',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36'
 }
-
 params = {
     'seasonId': 17,
     'userId': ''
 }
-
 result = requestPost(url, headers, params)
 
 # Filter data
