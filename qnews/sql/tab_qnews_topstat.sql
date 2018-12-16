@@ -20,10 +20,10 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 DROP TABLE IF EXISTS `tab_qnews_topstat`;
 CREATE TABLE `tab_qnews_topstat` (
-  `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '明星ID',
-  `sid` int(10) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `sid` int(10) NOT NULL COMMENT '明星ID',
   `sname` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '明星名称',
-  `value` int(10) NOT NULL COMMENT '数值',
+  `total` int(10) NOT NULL COMMENT '总量',
   `incr` int(10) NOT NULL COMMENT '增量',
   `time` int(10) NOT NULL COMMENT '时间',
   PRIMARY KEY (`id`)

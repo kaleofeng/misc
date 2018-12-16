@@ -38,7 +38,7 @@ def writeIntoDB(tableName, records):
 
         # Fetch last value
         last = record['count']
-        sql = 'SELECT value FROM %s WHERE sid = %d ORDER BY id DESC LIMIT 1' % (tableName, sid)
+        sql = 'SELECT total FROM %s WHERE sid = %d ORDER BY id DESC LIMIT 1' % (tableName, sid)
         try:
             cursor.execute(sql)
         except:
