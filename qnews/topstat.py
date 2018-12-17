@@ -34,32 +34,13 @@ def writeIntoDB(tableName, records):
 
     # Write each record
     for record in records:
-        sid = record['id']
-
-        # Fetch last value
-        last = record['count']
-        sql = 'SELECT total FROM %s WHERE sid = %d ORDER BY id DESC LIMIT 1' % (tableName, sid)
-        try:
-            cursor.execute(sql)
-        except:
-            print('Select record[%d] error!' % sid)
-            continue
-
-        for r in cursor.fetchall():
-            last = r[0]
-
-        # Calculate increment
-        record['incr'] = record['count'] - last
-        print('sid[%d] current[%d] last[%d] incr[%d]' % (sid, record['count'], last, record['incr']))
-
-        # Insert a new record
-        sql = "INSERT INTO %s VALUES(0, '%d', '%s', '%d', '%d', '%d')" % (tableName, sid, record['name'], record['count'], record['incr'], now)
+        sql = "INSERT INTO %s VALUES(0, '%d', '%s', '%d', '%d')" % (tableName, record['id'], record['name'], record['count'], now)
         try:
             cursor.execute(sql)
             db.commit()
         except:
             db.rollback()
-            print('Insert record[%d] error!' % sid)
+            print('Insert record[%d] error!' % record['id'])
     
     db.close()
     print('Write into db table[%s] done' % tableName)
