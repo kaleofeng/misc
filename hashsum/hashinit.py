@@ -9,22 +9,26 @@ import time
 import shutil
 import sys
 
-specificDir= ".mzs"
-specificName = "meta"
+specificDir= '.mzs'
+specificName = 'meta'
 
 def joinPath(basePath, subPath):
     resultPath = os.path.join(basePath, subPath)
-    resultPath = resultPath.replace("\\", "/", -1)
+    resultPath = resultPath.replace('\\', '/', -1)
     return resultPath
 
-def makeOrClearDir(dirPath):
+def removeDir(dirPath):
     pathExists = os.path.exists(dirPath)
     if pathExists:
-        print("remove dir", dirPath)
         shutil.rmtree(dirPath)
-    
-    print("make dir", dirPath)
+
+def makeDir(dirPath):
     os.mkdir(dirPath)
+
+def formatLine(prefix, fileSum, itemPath):
+    formatText = '{} {} {}\n'
+    itemLine = formatText.format(prefix, fileSum, itemPath)
+    return itemLine
 
 def hashFile(filePath):
     with open(filePath, 'rb') as f:
@@ -34,61 +38,66 @@ def hashFile(filePath):
         result = sha256.hexdigest()
         return result
 
-def hashItemLine(prefix, filePath, itemPath):
-    fileSum = hashFile(filePath)
-    formatText = "{} {} {}"
-    itemLine = formatText.format(prefix, fileSum, itemPath)
-    return itemLine
+def hashDir(basePath, relativePath):
+    print('-----', basePath, relativePath, '-----')
 
-def hashDir(dirPath, dirMetaPath):
-    print("-----", dirPath, dirMetaPath, "-----")
-    
-    makeOrClearDir(dirMetaPath)
+    dirPath = joinPath(basePath, relativePath)
+
+    baseMetaPath = joinPath(basePath, specificDir)
+    dirMetaPath = joinPath(baseMetaPath, relativePath)
+    removeDir(dirMetaPath)
+    makeDir(dirMetaPath)
+
+    sdPaths = []
+    sfPaths = []
+    itemLines = []
+
+    for item in os.listdir(dirPath):
+        itemPath = joinPath(dirPath, item)
+
+        isDir = os.path.isdir(itemPath)
+        if isDir:
+            sdPaths.append((item, itemPath))
+
+        isFile = os.path.isfile(itemPath)
+        if isFile:
+            sfPaths.append((item, itemPath))
+
+    for sdPath in sdPaths:
+        sDirName = sdPath[0]
+        sDirPath = sdPath[1]
+        isSpecific = sDirPath.find(specificDir) >= 0
+        if isSpecific:
+            continue
+
+        sRelativePath = joinPath(relativePath, sDirName)
+        itemSum = hashDir(basePath, sRelativePath)
+        itemLine = formatLine('d', itemSum, sDirName)
+        itemLines.append(itemLine)
+
+    for sfPath in sfPaths:
+        sFileName = sfPath[0]
+        sFilePath = sfPath[1]
+        itemSum = hashFile(sFilePath)
+        itemLine = formatLine('f', itemSum, sFileName)
+        itemLines.append(itemLine)
 
     metaFilePath = joinPath(dirMetaPath, specificName)
     with open(metaFilePath, 'w') as f:
-        sdPaths = []
-        sfPaths = []
+        f.writelines(itemLines)
 
-        for item in os.listdir(dirPath):
-            itemPath = joinPath(dirPath, item)
-            itemMetaPath = joinPath(dirMetaPath, item)
+    for itemLine in itemLines:
+        print(itemLine, end='')
 
-            isDir = os.path.isdir(itemPath)
-            if isDir:
-                sdPaths.append((itemPath, itemMetaPath))
+    selfSum = hashFile(metaFilePath)
+    selfLine = formatLine('s', selfSum, '.')
+    print(selfLine, end='')
 
-            isFile = os.path.isfile(itemPath)
-            if isFile:
-                sfPaths.append((itemPath, itemMetaPath))
-
-        for sdPath in sdPaths:
-            sDirPath = sdPath[0]
-            sDirMetaPath = sdPath[1]
-            isSpecific = sDirPath.find(specificDir) >= 0
-            if isSpecific:
-                continue
-
-            hashDir(sDirPath, sDirMetaPath)
-
-            sMetaFilePath = os.path.join(sDirMetaPath, specificName)
-            itemLine = hashItemLine("d", sMetaFilePath, sDirPath)
-            f.write(itemLine)
-            f.write("\n")
-            print(itemLine)
-
-        for sfPath in sfPaths:
-            sFilePath = sfPath[0]
-            itemLine = hashItemLine("f", sFilePath, sFilePath)
-            f.write(itemLine)
-            f.write("\n")
-            print(itemLine)
-    
-    print("=====", dirPath, dirMetaPath, "=====")
+    print('=====', basePath, relativePath, '=====')
+    return selfSum
 
 def hashInit(dirPath):
-    dirMetaPath = joinPath(dirPath, specificDir)
-    hashDir(dirPath, dirMetaPath)
+    hashDir(dirPath, '')
 
 if __name__ == '__main__':
     dirPath = sys.argv[1]
