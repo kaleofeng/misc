@@ -20,6 +20,7 @@ services:
     ports:
       - 8081:8080
     volumes:
+      - $PWD/tomcat/metazion_com/conf:/usr/local/tomcat/conf
       - $PWD/tomcat/metazion_com/webapps:/usr/local/tomcat/webapps
       - $PWD/tomcat/metazion_com/logs:/usr/local/tomcat/logs
     networks:
@@ -33,6 +34,7 @@ services:
     ports:
       - 8082:8080
     volumes:
+      - $PWD/tomcat/metazion_net/conf:/usr/local/tomcat/conf
       - $PWD/tomcat/metazion_net/webapps:/usr/local/tomcat/webapps
       - $PWD/tomcat/metazion_net/logs:/usr/local/tomcat/logs
     networks:
