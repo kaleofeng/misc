@@ -38,8 +38,8 @@ services:
       - $PWD/tomcat/metazion_net/webapps:/usr/local/tomcat/webapps
       - $PWD/tomcat/metazion_net/logs:/usr/local/tomcat/logs
     networks:
-      - metazion_web
       - metazion_db
+      - metazion_web
     depends_on:
       - mysql_common
   nginx_common:
