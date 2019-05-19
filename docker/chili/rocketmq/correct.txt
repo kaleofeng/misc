@@ -1,0 +1,1 @@
+echo 'brokerIP1 = {real ip}' > conf/broker.conf

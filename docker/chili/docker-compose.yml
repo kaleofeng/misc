@@ -1,20 +1,89 @@
 version: "3"
 services:
-  mysql_common:
-    container_name: mysql_common
+  mysql:
+    container_name: mysql_era
     image: mysql:8.0.13
     restart: always
     volumes:
-      - $PWD/mysql/conf:/etc/mysql/conf.d
+      - $PWD/mysql/conf:/etc/mysql
       - $PWD/mysql/data:/var/lib/mysql
     ports:
       - 3306:3306
-    environment:
-      - MYSQL_ROOT_PASSWORD=Root!123456
     networks:
-      - metazion_db
+      - net_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=Root123456
+
+  redis:
+    container_name: redis_era
+    image: redis:5.0.5
+    restart: always
+    volumes:
+      - $PWD/redis/conf:/etc/redis
+      - $PWD/redis/data:/data
+    ports:
+      - 6379:6379
+    networks:
+      - net_cache
+    command: ['redis-server', '/etc/redis/redis.conf']
+
+  etcd:
+    container_name: etcd_era
+    image: bitnami/etcd:3.3.13
+    restart: always
+    ports:
+      - 2379:2379
+      - 2380:2380
+    networks:
+      - net_ns
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+
+  rmqserver:
+    container_name: rmqserver_era
+    image: foxiswho/rocketmq:server-4.5.0
+    restart: always
+    volumes:
+      - $PWD/rocketmq/conf:/etc/rocketmq
+    ports:
+      - 9876:9876
+    networks:
+      - net_mq
+
+  rmqbroker:
+    container_name: rmqbroker_era
+    image: foxiswho/rocketmq:broker-4.5.0
+    restart: always
+    volumes:
+      - $PWD/rocketmq/conf:/etc/rocketmq
+    ports:
+      - 10911:10911
+      - 10909:10909
+    networks:
+      - net_mq
+    environment:
+      - 'NAMESRV_ADDR=rmqserver_era:9876'
+      - 'JAVA_OPTS=-Duser.home=/opt'
+      - 'JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m'
+    depends_on:
+      - rmqserver
+
+  rmqconsole:
+    container_name: rmqconsole_era
+    image: styletang/rocketmq-console-ng:1.0.0
+    restart: always
+    ports:
+      - 9888:8080
+    networks:
+      - net_mq
+    environment:
+      - 'JAVA_OPTS=-Drocketmq.namesrv.addr=rmqserver_era:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false'
+    depends_on:
+      - rmqserver
+      - rmqbroker
+
   tomcat_metazion_com:
-    container_name: tomcat_metazion_com
+    container_name: tomcat_metazion_com_era
     image: tomcat:8.5.35-jre8
     restart: always
     ports:
@@ -24,26 +93,20 @@ services:
       - $PWD/tomcat/metazion_com/webapps:/usr/local/tomcat/webapps
       - $PWD/tomcat/metazion_com/logs:/usr/local/tomcat/logs
     networks:
-      - metazion_web
+      - net_web
+      - net_db
+      - net_cache
+      - net_ns
+      - net_mq
     depends_on:
-      - mysql_common
-  tomcat_metazion_net:
-    container_name: tomcat_metazion_net
-    image: tomcat:8.5.35-jre8
-    restart: always
-    ports:
-      - 8082:8080
-    volumes:
-      - $PWD/tomcat/metazion_net/conf:/usr/local/tomcat/conf
-      - $PWD/tomcat/metazion_net/webapps:/usr/local/tomcat/webapps
-      - $PWD/tomcat/metazion_net/logs:/usr/local/tomcat/logs
-    networks:
-      - metazion_db
-      - metazion_web
-    depends_on:
-      - mysql_common
-  nginx_common:
-    container_name: nginx_common
+      - mysql
+      - redis
+      - etcd
+      - rmqserver
+      - rmqbroker
+
+  nginx:
+    container_name: nginx_era
     image: nginx:1.15.6
     restart: always
     ports:
@@ -51,16 +114,22 @@ services:
       - 443:443
     volumes:
       - $PWD/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
-      - $PWD/nginx/cert:/etc/nginx/cert
+      - $PWD/nginx/conf/cert:/etc/nginx/cert
       - $PWD/nginx/html:/var/share/nginx/html
       - $PWD/nginx/logs:/var/log/nginx
     networks:
-      - metazion_web
+      - net_web
     depends_on:
       - tomcat_metazion_com
-      - tomcat_metazion_net
+
 networks:
-  metazion_db:
+  net_db:
     driver: bridge
-  metazion_web:
+  net_cache:
+    driver: bridge
+  net_ns:
+    driver: bridge
+  net_mq:
+    driver: bridge
+  net_web:
     driver: bridge
