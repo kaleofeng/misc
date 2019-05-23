@@ -62,9 +62,8 @@ services:
     networks:
       - net_mq
     environment:
-      - 'NAMESRV_ADDR=rmqserver_era:9876'
       - 'JAVA_OPTS=-Duser.home=/opt'
-      - 'JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m'
+      - 'JAVA_OPT_EXT=-server -Xms256m -Xmx256m -Xmn96m'
     depends_on:
       - rmqserver
 

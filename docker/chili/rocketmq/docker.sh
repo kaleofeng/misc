@@ -1,3 +1,3 @@
 docker run --name rmqserver_era --network net_mq -p 9876:9876 -v $PWD/conf:/etc/rocketmq -d --restart always foxiswho/rocketmq:server-4.5.0
-docker run --name rmqbroker_era --network net_mq -p 10911:10911 -p 10909:10909 -v $PWD/conf:/etc/rocketmq -e "NAMESRV_ADDR=rmqserver_era:9876" -e "JAVA_OPTS=-Duser.home=/opt" -e "JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m" -d --restart always foxiswho/rocketmq:broker-4.5.0
+docker run --name rmqbroker_era --network net_mq -p 10911:10911 -p 10909:10909 -v $PWD/conf:/etc/rocketmq -e "JAVA_OPTS=-Duser.home=/opt" -e "JAVA_OPT_EXT=-server -Xms256m -Xmx256m -Xmn96m" -d --restart always foxiswho/rocketmq:broker-4.5.0
 docker run --name rmqconsole_era --network net_mq -p 9888:8080 -e "JAVA_OPTS=-Drocketmq.namesrv.addr=rmqserver_era:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false" -d --restart always styletang/rocketmq-console-ng:1.0.0
