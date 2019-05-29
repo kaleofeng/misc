@@ -50,6 +50,9 @@ services:
       - 9876:9876
     networks:
       - net_mq
+    environment:
+      - 'JAVA_OPTS=-Duser.home=/opt'
+      - 'JAVA_OPT_EXT=-server -Xms256m -Xmx256m -Xmn96m'
 
   rmqbroker:
     container_name: rmqbroker_era
