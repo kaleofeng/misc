@@ -1,6 +1,6 @@
 ./certbot-auto certificates
 ./certbot-auto delete --cert-name metazion.com
 ./certbot-auto certificates
-./certbot-auto certonly -d *.metazion.com -d metazion.com --email kaleofeng@gmail.com --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory
+./certbot-auto certonly -d metazion.com -d *.metazion.com --email kaleofeng@gmail.com --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory
 ./certbot-auto certificates
 ll /etc/letsencrypt/live/
