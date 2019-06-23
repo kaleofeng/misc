@@ -37,14 +37,14 @@ def requestSingerFans(todayTotal):
     while end < todayTotal:
         print("---------------", begin, end, todayTotal)
 
-        url = 'https://c.y.qq.com/shop/fcgi-bin/fcg_album_rank?g_tk=1943180057&uin=12345678&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&ct=23&cv=0&begin='
+        url = 'https://c.y.qq.com/shop/fcgi-bin/fcg_album_rank?g_tk=1330568935&uin=12345678&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&ct=23&cv=0&begin='
         url += str(begin)
         url += '&end='
         url += str(end)
-        url += '&rankname=uin_rank_peract_279&_=1535634979229'
+        url += '&rankname=uin_rank_peract_352&_=1535634979229'
         ret = requestGet(url)
 
-        stats += ret['data']['uin_rank_peract_279']
+        stats += ret['data']['uin_rank_peract_352']
 
         begin += patchCount
         end += patchCount
@@ -67,5 +67,5 @@ for stat in stats:
     ws.write(line, 2, stat['iScore'])
 
 statTime = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(time.time()))
-xlsName = 'peractall_' + statTime + '.xls'
+xlsName = 'data/peractall_' + statTime + '.xls'
 book.save(xlsName)

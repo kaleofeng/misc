@@ -26,7 +26,7 @@ header = {
 
 dataCall = {
   "comm": {
-    "g_tk": 2078841671,
+    "g_tk": 1330568935,
     "uin": 12345678,
     "format": "json",
     "inCharset": "utf-8",
@@ -40,7 +40,7 @@ dataCall = {
   "requestSingerCallList": {
     "method": "SingerFansRankList",
     "param": {
-      "actid": 279,
+      "actid": 352,
       "singerid": 2141375,
       "rank_type": 0,
       "start": 0,
@@ -50,11 +50,11 @@ dataCall = {
   }
 }
 
-def filterEmoji(text):  
-    try:  
-        co = re.compile(u'[\U00010000-\U0010ffff]')  
-    except re.error:  
-        co = re.compile(u'[\uD800-\uDBFF][\uDC00-\uDFFF]')  
+def filterEmoji(text):
+    try:
+        co = re.compile(u'[\U00010000-\U0010ffff]')
+    except re.error:
+        co = re.compile(u'[\uD800-\uDBFF][\uDC00-\uDFFF]')
     return co.sub(u'', text)
 
 def requestPost(data):
@@ -120,7 +120,7 @@ def writeToXls(xlsName, stats):
       ws.write(line, 2, stat['nick'])
       ws.write(line, 3, str(stat['uin']))
       ws.write(line, 4, stat['pic'])
-  
+
   book.save(xlsName)
 
 def writeToDB(tableName, singerCalls):
@@ -134,9 +134,9 @@ def writeToDB(tableName, singerCalls):
     # except:
     #     db.rollback()
     #     print('truncate table error')
-    
+
     recordTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
-    
+
     for sct in singerCalls:
         print(sct['rank'], sct['call_num'], sct['nick'], sct['pic'])
         sql = "REPLACE INTO %s VALUES('%d', '%d', '%d', '%d', '%s', '%s', '%s')" % (tableName, singer, sct['rank'], sct['call_num'], sct['uin'], sct['nick'], sct['pic'], recordTime)
@@ -146,16 +146,16 @@ def writeToDB(tableName, singerCalls):
         except:
             db.rollback()
             print('insert error')
-    
+
     db.close()
 
 statTime = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(time.time()))
 
-xlsTotal = 'fanstotal_%s_%s.xls' % (singer, statTime)
+xlsTotal = 'data/fanstotal_%s_%s.xls' % (singer, statTime)
 writeToXls(xlsTotal, singerCallsTotal)
 
-xlsToday = 'fanstoday_%s_%s.xls' % (singer, statTime)
+xlsToday = 'data/fanstoday_%s_%s.xls' % (singer, statTime)
 writeToXls(xlsToday, singerCallsToday)
 
-writeToDB('tab_album_total', singerCallsTotal)
-writeToDB('tab_album_today', singerCallsToday)
+#writeToDB('tab_album_total', singerCallsTotal)
+#writeToDB('tab_album_today', singerCallsToday)

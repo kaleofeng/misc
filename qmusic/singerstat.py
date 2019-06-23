@@ -43,7 +43,7 @@ params = {
             "rank_type": 0,
             "start": 0,
             "num": 1
-        },  
+        },
         "module": "mall.AlbumCallSvr"
     },
     "requestSingerTodayCallList": {
@@ -74,6 +74,11 @@ def requestPost(url, headers, params):
     result = json.loads(rsp.read().decode('utf-8'))
     return result
 
+albums = {
+    "279": "撞",
+    "352": "立风"
+}
+
 singers = {
     "1527896": "孟美岐",
     "2141217": "吴宣仪",
@@ -90,26 +95,32 @@ singers = {
 
 stats = []
 
-for key in singers:
-    singer = int(key)
-    params["requestSingerTotalCallList"]["param"]["singerid"] = singer
-    params["requestSingerTodayCallList"]["param"]["singerid"] = singer
-    params["requestSingerInfo"]["param"]["singerid"] = singer
-  
-    ret = requestPost(url, headers, params)
-  
-    totalAlbums = ret["requestSingerInfo"]["data"]["call_num"]
-    todayPersons = ret["requestSingerTodayCallList"]["data"]["total"]
-    totalPersons = ret["requestSingerTotalCallList"]["data"]["total"]
-  
-    stat = {}
-    stat["singer"] = singer
-    stat["name"] = singers[key]
-    stat["todayPersons"] = todayPersons
-    stat["totalPersons"] = totalPersons
-    stat["totalAlbums"] = totalAlbums
-    stat["averageAlbum"] = float("%.2f" % (totalAlbums / totalPersons))
-    stats.append(stat)
+for ka in albums:
+    album = int(ka)
+    for ks in singers:
+        singer = int(ks)
+        params["requestSingerTotalCallList"]["param"]["actid"] = album
+        params["requestSingerTotalCallList"]["param"]["singerid"] = singer
+        params["requestSingerTodayCallList"]["param"]["actid"] = album
+        params["requestSingerTodayCallList"]["param"]["singerid"] = singer
+        params["requestSingerInfo"]["param"]["actid"] = album
+        params["requestSingerInfo"]["param"]["singerid"] = singer
+
+        ret = requestPost(url, headers, params)
+
+        totalAlbums = ret["requestSingerInfo"]["data"]["call_num"]
+        todayPersons = ret["requestSingerTodayCallList"]["data"]["total"]
+        totalPersons = ret["requestSingerTotalCallList"]["data"]["total"]
+
+        stat = {}
+        stat["album"] = album
+        stat["singer"] = singer
+        stat["name"] = singers[ks]
+        stat["todayPersons"] = todayPersons
+        stat["totalPersons"] = totalPersons
+        stat["totalAlbums"] = totalAlbums
+        stat["averageAlbum"] = float("%.2f" % (totalAlbums / totalPersons))
+        stats.append(stat)
 
 # Current time, ingore seconds
 now = int(time.time())
@@ -118,43 +129,45 @@ now -= now % 60
 def writeIntoFile(xlsName, stats):
     book = xlwt.Workbook()
     ws = book.add_sheet("统计")
-    ws.write(0, 0, "ID")
-    ws.write(0, 1, "名字")
-    ws.write(0, 2, "今日助燃人数")
-    ws.write(0, 3, "总助燃人数")
-    ws.write(0, 4, "总助燃数量")
-  
+    ws.write(0, 0, "专辑ID")
+    ws.write(0, 1, "歌手ID")
+    ws.write(0, 2, "歌手名字")
+    ws.write(0, 3, "今日助燃人数")
+    ws.write(0, 4, "总助燃人数")
+    ws.write(0, 5, "总助燃数量")
+
     line = 0
     for stat in stats:
         line += 1
-        ws.write(line, 0, stat["singer"])
-        ws.write(line, 1, stat["name"])
-        ws.write(line, 2, stat["todayPersons"])
-        ws.write(line, 3, stat["totalPersons"])
-        ws.write(line, 4, stat["totalAlbums"])
+        ws.write(line, 0, stat["album"])
+        ws.write(line, 1, stat["singer"])
+        ws.write(line, 2, stat["name"])
+        ws.write(line, 3, stat["todayPersons"])
+        ws.write(line, 4, stat["totalPersons"])
+        ws.write(line, 5, stat["totalAlbums"])
         print(stat)
-    
+
     book.save(xlsName)
     print("Write into file xls[%s] done" % xlsName)
 
 statTime = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime(now))
-xlsName = "qmusic_singerstat_" + statTime + ".xls"
+xlsName = "data/qmusic_singerstat_" + statTime + ".xls"
 writeIntoFile(xlsName, stats)
 
 def writeIntoDB(tableName, stats):
-    db = pymysql.connect(host="127.0.0.1", user="root", passwd="123456", db="album", charset="utf8mb4")
+    db = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="tool", charset="utf8mb4")
     cursor = db.cursor()
 
     # Write each record
     for stat in stats:
-        sql = "INSERT INTO %s VALUES(0, '%d', '%s', '%d', '%d', '%d', '%d')" % (tableName, stat["singer"], stat["name"], stat["todayPersons"], stat["totalPersons"], stat["totalAlbums"], now)
+        sql = "INSERT INTO %s VALUES(0, '%d', '%d', '%s', '%d', '%d', '%d', '%d')" % (tableName, stat["album"], stat["singer"], stat["name"], stat["todayPersons"], stat["totalPersons"], stat["totalAlbums"], now)
         try:
             cursor.execute(sql)
             db.commit()
         except:
             db.rollback()
             print("Insert record[%d] error!" % stat["singer"])
-    
+
     db.close()
     print("Write into db table[%s] done" % tableName)
 
