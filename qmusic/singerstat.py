@@ -114,8 +114,9 @@ for ka in albums:
 
         stat = {}
         stat["album"] = album
+        stat["albumName"] = albums[ka]
         stat["singer"] = singer
-        stat["name"] = singers[ks]
+        stat["singerName"] = singers[ks]
         stat["todayPersons"] = todayPersons
         stat["totalPersons"] = totalPersons
         stat["totalAlbums"] = totalAlbums
@@ -140,11 +141,12 @@ def writeIntoFile(xlsName, stats):
     for stat in stats:
         line += 1
         ws.write(line, 0, stat["album"])
-        ws.write(line, 1, stat["singer"])
-        ws.write(line, 2, stat["name"])
-        ws.write(line, 3, stat["todayPersons"])
-        ws.write(line, 4, stat["totalPersons"])
-        ws.write(line, 5, stat["totalAlbums"])
+        ws.write(line, 1, stat["albumName"])
+        ws.write(line, 2, stat["singer"])
+        ws.write(line, 3, stat["singerName"])
+        ws.write(line, 4, stat["todayPersons"])
+        ws.write(line, 5, stat["totalPersons"])
+        ws.write(line, 6, stat["totalAlbums"])
         print(stat)
 
     book.save(xlsName)
@@ -160,7 +162,7 @@ def writeIntoDB(tableName, stats):
 
     # Write each record
     for stat in stats:
-        sql = "INSERT INTO %s VALUES(0, '%d', '%d', '%s', '%d', '%d', '%d', '%d')" % (tableName, stat["album"], stat["singer"], stat["name"], stat["todayPersons"], stat["totalPersons"], stat["totalAlbums"], now)
+        sql = "INSERT INTO %s VALUES(0, '%d', '%d', '%s', '%d', '%d', '%d', '%d')" % (tableName, stat["album"], stat["singer"], stat["singerName"], stat["todayPersons"], stat["totalPersons"], stat["totalAlbums"], now)
         try:
             cursor.execute(sql)
             db.commit()
