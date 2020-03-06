@@ -33,7 +33,8 @@ def requestPost(url, headers, params):
 
 serviceHost = 'https://www.metazion.net/'
 ridUrl = serviceHost + '/misc/id/uuid'
-billboardUrl = serviceHost + '/billboard/save'
+billboardSetupUrl = serviceHost + '/billboard/setup'
+billboardSaveUrl = serviceHost + '/billboard/save'
 
 ridData = requestGet(ridUrl)
 ridJson = json.loads(ridData)
@@ -43,8 +44,21 @@ rid = ridJson['uuid']
 print(rid, flush=True)
 
 rid = 'a29ac5771ba94758b3f223a9b35cb306'
+password = '123456'
+note = '服务器IP'
 
 schedule = sched.scheduler(time.time, time.sleep)
+
+def setupRecord():
+    print('setupRecord', flush=True)
+
+    billboardData = {}
+    billboardData['rid'] = rid
+    billboardData['password'] = password
+    billboardData['note'] = note
+
+    ret = requestPost(billboardSetupUrl, header, billboardData)
+    print(ret, flush=True)
 
 def checkAndSaveIp(interval):
     print('checkAndSaveIp', interval, flush=True)
@@ -56,8 +70,9 @@ def checkAndSaveIp(interval):
     billboardData = {}
     billboardData['rid'] = rid
     billboardData['value'] = ipData
+    billboardData['password'] = password
 
-    ret = requestPost(billboardUrl, header, billboardData)
+    ret = requestPost(billboardSaveUrl, header, billboardData)
     print(ret, flush=True)
 
     schedule.enter(interval, 0, checkAndSaveIp, (interval,))
@@ -66,4 +81,5 @@ def startSchedule(interval):
     schedule.enter(0, 0, checkAndSaveIp, (interval,))
     schedule.run()
 
-startSchedule(10)
+setupRecord()
+startSchedule(300)
