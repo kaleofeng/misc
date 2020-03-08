@@ -23,6 +23,7 @@ clients = {}
 CMD_REGISTER = 1001
 
 CMD_SYNC = 2001
+CMD_WELCOME = 2002
 
 def syncOtherClient(id, addr, peerAddr):
     print('syncOtherClient', id, addr, peerAddr, flush=True)
@@ -43,6 +44,9 @@ def handleRegister(data, peerAddr):
     id = fields[0]
     clients[id] = peerAddr
     print('handleRegister', clients, flush=True)
+
+    msg = struct.pack('ii7s', CMD_WELCOME, id, b'Welcome')
+    ss.sendto(msg, peerAddr)
 
     for (k, v) in clients.items():
         print(k, v, flush=True)
@@ -66,7 +70,7 @@ def handleMsg(msg, peerAddr):
 
     handles.get(cmd, handleUnknown)(data, peerAddr)
 
-def main():
+def tick():
     try:
         while True:
             msg, peerAddr = ss.recvfrom(1024)
@@ -77,6 +81,10 @@ def main():
         print(e, flush=True)
     except KeyboardInterrupt:
         ss.close()
+
+def main():
+    t = threading.Thread(target=tick, args=())
+    t.start()
 
 if __name__ == '__main__':
     main()

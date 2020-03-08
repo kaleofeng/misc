@@ -12,7 +12,7 @@ import threading
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')
 
-remoteHost = 'www.metazion.net'
+remoteHost = '127.0.0.1'
 remotePort = 10080
 remoteAddr = (remoteHost, remotePort)
 
@@ -23,6 +23,7 @@ SELF_ID = 1
 CMD_REGISTER = 1001
 
 CMD_SYNC = 2001
+CMD_WELCOME = 2002
 
 CMD_HI = 3001
 
@@ -39,7 +40,14 @@ def handleSync(data, peerAddr):
 
     msg = struct.pack('ii2s', CMD_HI, SELF_ID, b'Hi')
     cs.sendto(msg, (ip, port))
-    cs.sendto(msg, (ip, port))
+
+def handleWelcome(data, peerAddr):
+    print('handleWelcome', data, peerAddr, flush=True)
+
+    fields = struct.unpack('i7s', data)
+    peerId = fields[0]
+    info = fields[1]
+    print('handleWelcome', peerId, info, peerAddr, flush=True)
 
 def handleHi(data, peerAddr):
     print('handleHi', data, peerAddr, flush=True)
@@ -54,6 +62,7 @@ def handleUnknown(data, peerAddr):
 
 handles = {
     CMD_SYNC: handleSync,
+    CMD_WELCOME: handleWelcome,
 
     CMD_HI: handleHi
 }
@@ -72,12 +81,7 @@ def register():
     cs.sendto(msg, remoteAddr)
     print(msg, remoteAddr)
 
-def main():
-    global SELF_ID
-    SELF_ID = int(sys.argv[1])
-
-    register()
-
+def tick():
     try:
         while True:
             msg, peerAddr = cs.recvfrom(1024)
@@ -88,6 +92,15 @@ def main():
         print(e, flush=True)
     except KeyboardInterrupt:
         cs.close()
+
+def main():
+    global SELF_ID
+    SELF_ID = int(sys.argv[1])
+
+    register()
+
+    t = threading.Thread(target=tick, args=())
+    t.start()
 
 if __name__ == '__main__':
     main()
