@@ -20,12 +20,20 @@ cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 SELF_ID = 1
 
+friends = {}
+
 CMD_REGISTER = 1001
 
 CMD_SYNC = 2001
 CMD_WELCOME = 2002
 
 CMD_HI = 3001
+
+def sayHi(id, peerAddr):
+    print('sayHi', id, peerAddr, flush=True)
+
+    msg = struct.pack('ii2s', CMD_HI, id, b'Hi')
+    cs.sendto(msg, peerAddr)
 
 def handleSync(data, peerAddr):
     print('handleSync', data, peerAddr, flush=True)
@@ -36,10 +44,10 @@ def handleSync(data, peerAddr):
     id = fields[0]
     ip = str.rstrip(fields[1].decode('utf-8'), '\0')
     port = fields[2]
+    friends[id] = (ip, port)
     print('handleSync', id, ip, len(ip), port, flush=True)
 
-    msg = struct.pack('ii2s', CMD_HI, SELF_ID, b'Hi')
-    cs.sendto(msg, (ip, port))
+    sayHi(SELF_ID, (ip, port))
 
 def handleWelcome(data, peerAddr):
     print('handleWelcome', data, peerAddr, flush=True)
@@ -93,14 +101,28 @@ def tick():
     except KeyboardInterrupt:
         cs.close()
 
+def command():
+    while True:
+        try:
+            id = int(input('Input target id: '))
+            print('command', id, friends, flush=True)
+
+            peerAddr = friends.get(id, ())
+            sayHi(id, peerAddr)
+        except Exception as e:
+            print(e, flush=True)
+
 def main():
     global SELF_ID
     SELF_ID = int(sys.argv[1])
 
     register()
 
-    t = threading.Thread(target=tick, args=())
-    t.start()
+    t1 = threading.Thread(target=tick, args=())
+    t1.start()
+
+    t2 = threading.Thread(target=command, args=())
+    t2.start()
 
 if __name__ == '__main__':
     main()
