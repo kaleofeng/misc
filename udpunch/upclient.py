@@ -12,7 +12,7 @@ import threading
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')
 
-remoteHost = '127.0.0.1'
+remoteHost = 'www.metazion.net'
 remotePort = 10080
 remoteAddr = (remoteHost, remotePort)
 
@@ -47,7 +47,7 @@ def handleSync(data, peerAddr):
     friends[id] = (ip, port)
     print('handleSync', id, ip, len(ip), port, flush=True)
 
-    sayHi(SELF_ID, (ip, port))
+    sayHi(id, (ip, port))
 
 def handleWelcome(data, peerAddr):
     print('handleWelcome', data, peerAddr, flush=True)
@@ -75,19 +75,19 @@ handles = {
     CMD_HI: handleHi
 }
 
-def handleMsg(msg, peerAddr):
-    print('handleMsg', msg, peerAddr, flush=True)
+def processMsg(msg, peerAddr):
+    print('processMsg', msg, peerAddr, flush=True)
 
     cmd = struct.unpack('i', msg[:4])[0]
     data = msg[4:]
-    print('handleMsg', cmd, data, flush=True)
+    print('processMsg', cmd, data, flush=True)
 
     handles.get(cmd, handleUnknown)(data, peerAddr)
 
 def register():
     msg = struct.pack('ii', CMD_REGISTER, SELF_ID)
     cs.sendto(msg, remoteAddr)
-    print(msg, remoteAddr)
+    print('register', msg, remoteAddr)
 
 def tick():
     try:
@@ -95,9 +95,9 @@ def tick():
             msg, peerAddr = cs.recvfrom(1024)
             print(msg, len(msg), peerAddr, flush=True)
 
-            handleMsg(msg, peerAddr)
+            processMsg(msg, peerAddr)
     except socket.error as e:
-        print(e, flush=True)
+        print('tick', e, flush=True)
     except KeyboardInterrupt:
         cs.close()
 
@@ -110,7 +110,7 @@ def command():
             peerAddr = friends.get(id, ())
             sayHi(id, peerAddr)
         except Exception as e:
-            print(e, flush=True)
+            print('command', e, flush=True)
 
 def main():
     global SELF_ID

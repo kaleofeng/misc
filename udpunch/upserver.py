@@ -17,6 +17,7 @@ localPort = 10080
 
 ss = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 ss.bind((localHost, localPort))
+print('bind', (localHost, localPort), flush=True)
 
 clients = {}
 
@@ -83,7 +84,7 @@ def tick():
 
             processMsg(msg, peerAddr)
     except socket.error as e:
-        print(e, flush=True)
+        print('tick', e, flush=True)
     except KeyboardInterrupt:
         ss.close()
 
@@ -96,7 +97,7 @@ def command():
             peerAddr = clients.get(id, ())
             sayWelcome(id, peerAddr)
         except Exception as e:
-            print(e, flush=True)
+            print('command', e, flush=True)
 
 def main():
     t1 = threading.Thread(target=tick, args=())
