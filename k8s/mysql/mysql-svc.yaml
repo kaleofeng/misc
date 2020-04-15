@@ -8,10 +8,9 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - port: 3306
-    protocol: TCP
-    targetPort: 3306
-    name: http
+  - protocol: TCP
+    port: 3306
     nodePort: 3306
+    targetPort: 3306
   selector:
     app: mysql-pod
