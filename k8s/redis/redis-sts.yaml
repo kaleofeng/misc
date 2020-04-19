@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-sts
+  namespace: default
+spec:
+  serviceName: redis-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-pod
+  template:
+    metadata:
+      labels:
+        app: redis-pod
+    spec:
+      containers:
+      - name: redis
+        image: redis:5.0.5
+        imagePullPolicy: IfNotPresent
+        command:
+        - 'redis-server'
+        args:
+        - '/etc/redis/redis.conf'
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-conf
+          mountPath: /etc/redis
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-conf
+        configMap:
+          name: redis-conf
+          items:
+          - key: redis.conf
+            path: redis.conf
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      storageClassName: managed-nfs-storage
+      accessModes:
+      - ReadWriteMany
+      resources:
+        requests:
+          storage: 5Gi
