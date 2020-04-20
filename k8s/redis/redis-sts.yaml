@@ -8,11 +8,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: redis-pod
+      app: redis
   template:
     metadata:
       labels:
-        app: redis-pod
+        app: redis
     spec:
       containers:
       - name: redis
@@ -24,6 +24,10 @@ spec:
         - '/etc/redis/redis.conf'
         ports:
         - containerPort: 6379
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
         volumeMounts:
         - name: redis-conf
           mountPath: /etc/redis
