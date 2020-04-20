@@ -4,7 +4,7 @@ metadata:
   name: mysql-svc
   namespace: default
   labels:
-    app: mysql-svc
+    app: mysql
 spec:
   type: NodePort
   ports:
@@ -13,4 +13,4 @@ spec:
     nodePort: 3306
     targetPort: 3306
   selector:
-    app: mysql-pod
+    app: mysql
