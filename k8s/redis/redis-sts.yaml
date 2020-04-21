@@ -4,7 +4,7 @@ metadata:
   name: redis-sts
   namespace: default
 spec:
-  serviceName: redis-svc
+  serviceName: redis-svc-headless
   replicas: 1
   selector:
     matchLabels:
@@ -19,9 +19,9 @@ spec:
         image: redis:5.0.5
         imagePullPolicy: IfNotPresent
         command:
-        - 'redis-server'
+        - redis-server
         args:
-        - '/etc/redis/redis.conf'
+        - /etc/redis/redis.conf
         ports:
         - containerPort: 6379
         resources:
@@ -46,7 +46,7 @@ spec:
     spec:
       storageClassName: managed-nfs-storage
       accessModes:
-      - ReadWriteMany
+      - ReadWriteOnce
       resources:
         requests:
           storage: 5Gi
