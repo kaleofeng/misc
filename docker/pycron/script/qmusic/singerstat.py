@@ -128,7 +128,13 @@ for k in albums:
 now = int(time.time())
 now -= now % 60
 
+currentPath = os.path.dirname(os.path.abspath(__file__))
+print("Current path %s" % (currentPath))
+
 def writeIntoFile(xlsName, stats):
+    xlsPath = os.path.abspath(os.path.join(currentPath, "data", xlsName))
+    print("Xls file path %s" % (xlsPath))
+
     book = xlwt.Workbook()
     ws = book.add_sheet("统计")
     ws.write(0, 0, "专辑ID")
@@ -149,18 +155,16 @@ def writeIntoFile(xlsName, stats):
         ws.write(line, 5, stat["totalAlbums"])
         print(stat)
 
-    book.save(xlsName)
-    print("Write into file xls[%s] done" % xlsName)
+    book.save(xlsPath)
+    print("Write into file xls[%s] done" % xlsPath)
 
 statTime = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime(now))
-xlsName = "data/qmusic_singerstat_" + statTime + ".xls"
+xlsName = "qmusic_singerstat_" + statTime + ".xls"
 writeIntoFile(xlsName, stats)
 
 def writeIntoDB(tableName, stats):
-    absPath = os.path.dirname(os.path.abspath(__file__))
-    joinPath = os.path.join(absPath, "../conf/db.conf")
-    confPath = os.path.abspath(joinPath)
-    print("DB conf path %s %s %s" % (absPath, joinPath, confPath))
+    confPath = os.path.abspath(os.path.join(currentPath, "../conf/db.conf"))
+    print("DB conf path %s" % (confPath))
 
     confDB = configparser.ConfigParser()
     confDB.read(confPath)
@@ -171,7 +175,7 @@ def writeIntoDB(tableName, stats):
     mysqlPassword    = confDB.get("mysql", "password")
     mysqlDB          = confDB.get("mysql", "db")
     mysqlCharset     = confDB.get("mysql", "charset")
-    print("DB mysql info %s %s %s %s %s %s" % (mysqlHost, mysqlPort, mysqlUser, mysqlPassword, mysqlDB, mysqlCharset), flush=True)
+    print("DB mysql info %s %s %s %s %s %s" % (mysqlHost, mysqlPort, mysqlUser, mysqlPassword, mysqlDB, mysqlCharset))
 
     db = pymysql.connect(host=mysqlHost, port=int(mysqlPort), user=mysqlUser, passwd=mysqlPassword, db=mysqlDB, charset=mysqlCharset)
     cursor = db.cursor()

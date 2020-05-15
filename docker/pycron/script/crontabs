@@ -1,1 +1,1 @@
-59 23 * * * /usr/bin/python3 /data/script/qmusic/singerstat.py >> /data/script/qmusic/singerstat.log 2>&1
+59 23 * * * /usr/bin/python3 /data/script/qmusic/singerstat.py >> /data/script/qmusic/log/singerstat.log 2>&1
