@@ -6,12 +6,12 @@ spec:
   capacity:
     storage: 64Mi
   accessModes:
-  - ReadWriteMany
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: /export/nfs/mysql/conf
     server: omv.metazion.int
----
+  ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -20,7 +20,7 @@ spec:
   capacity:
     storage: 5Gi
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: /export/nfs/mysql/data

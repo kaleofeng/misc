@@ -4,18 +4,18 @@ metadata:
   name: mysql-pvc-conf
 spec:
   accessModes:
-  - ReadWriteMany
+    - ReadWriteMany
   resources:
     requests:
       storage: 64Mi
----
+  ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-pvc-data
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 5Gi

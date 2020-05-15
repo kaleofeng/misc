@@ -9,11 +9,11 @@ spec:
   type: ClusterIP
   clusterIP: None
   ports:
-  - protocol: TCP
+    - protocol: TCP
     port: 6379
   selector:
     app: redis
----
+  ---
 apiVersion: v1
 kind: Service
 metadata:
@@ -24,7 +24,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - protocol: TCP
+    - protocol: TCP
     port: 6379
     nodePort: 6379
     targetPort: 6379

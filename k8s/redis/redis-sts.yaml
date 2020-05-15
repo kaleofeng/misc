@@ -15,38 +15,38 @@ spec:
         app: redis
     spec:
       containers:
-      - name: redis
+        - name: redis
         image: redis:5.0.5
         imagePullPolicy: IfNotPresent
         command:
-        - redis-server
+          - redis-server
         args:
-        - /etc/redis/redis.conf
+          - /etc/redis/redis.conf
         ports:
-        - containerPort: 6379
+          - containerPort: 6379
         resources:
           requests:
             cpu: 100m
             memory: 100Mi
         volumeMounts:
-        - name: redis-conf
+          - name: redis-conf
           mountPath: /etc/redis
-        - name: redis-data
+          - name: redis-data
           mountPath: /data
       volumes:
-      - name: redis-conf
+        - name: redis-conf
         configMap:
           name: redis-conf
           items:
-          - key: redis.conf
+            - key: redis.conf
             path: redis.conf
   volumeClaimTemplates:
-  - metadata:
+    - metadata:
       name: redis-data
     spec:
       storageClassName: managed-nfs-storage
       accessModes:
-      - ReadWriteOnce
+        - ReadWriteOnce
       resources:
         requests:
           storage: 5Gi
