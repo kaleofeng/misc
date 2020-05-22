@@ -4,7 +4,7 @@ docker run \
   --restart always \
   -d \
   -p 8081:8080 \
-  -v $PWD/conf:/usr/local/tomcat/conf \
+  -v $PWD/conf/server.xml:/usr/local/tomcat/conf/server.xml \
   -v $PWD/webapps:/usr/local/tomcat/webapps \
   -v $PWD/logs:/usr/local/tomcat/logs \
-  tomcat:8.5.35-jre8
+  tomcat:9.0.35-jdk14-openjdk-oracle

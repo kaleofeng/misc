@@ -9,4 +9,4 @@ docker run \
   -v $PWD/conf/cert:/etc/nginx/cert \
   -v $PWD/html:/var/share/nginx/html \
   -v $PWD/logs:/var/log/nginx \
-  nginx:1.15.6
+  nginx:1.17.10

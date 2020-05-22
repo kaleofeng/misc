@@ -7,5 +7,5 @@ docker run \
   -v $PWD/conf:/etc/mysql \
   -v $PWD/data:/var/lib/mysql \
   -e MYSQL_ROOT_PASSWORD=Root123456 \
-  mysql:8.0.13 \
+  mysql:8.0.20 \
   --default-authentication-plugin=mysql_native_password
