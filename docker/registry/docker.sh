@@ -1,8 +1,8 @@
 docker run \
   --name registry \
-  --network registry \
   --restart always  \
-  -d \
-  -p 5000:5000 \
-  -v $PWD/registry:/var/lib/registry/ \
-  registry
+  --publish 5000:5000 \
+  --volume $PWD/registry:/var/lib/registry/ \
+  --network registry \
+  --detach \
+  registry:2.7.1

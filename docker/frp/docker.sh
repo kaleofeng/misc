@@ -1,13 +1,13 @@
 docker run \
   --name frps \
-  --network frp \
   --restart=always  \
-  -d \
-  -p 50000:50000 \
-  -p 50500:50500 \
-  -p 50080:50080 \
-  -p 50443:50443 \
-  -p 50022:50022 \
-  -p 50122:50122 \
-  -v /data/docker/frp/conf/frps.ini:/etc/frp/frps.ini  \
-  snowdreamtech/frps
+  --publish 50000:50000 \
+  --publish 50500:50500 \
+  --publish 50080:50080 \
+  --publish 50443:50443 \
+  --publish 50022:50022 \
+  --publish 50122:50122 \
+  --volume $PWD/conf/frps.ini:/etc/frp/frps.ini \
+  --network net_frp \
+  --detach \
+  snowdreamtech/frps:0.33.0

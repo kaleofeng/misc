@@ -1,10 +1,10 @@
 docker run \
   --name redis_era \
-  --network net_cache \
   --restart always \
-  -d \
-  -p 6379:6379 \
-  -v $PWD/conf:/etc/redis \
-  -v $PWD/data:/data \
+  --publish 6379:6379 \
+  --volume $PWD/conf:/etc/redis \
+  --volume $PWD/data:/data \
+  --network net_cache \
+  --detach \
   redis:6.0.3 \
   redis-server /etc/redis/redis.conf

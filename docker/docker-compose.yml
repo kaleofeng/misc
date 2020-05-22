@@ -1,41 +1,44 @@
-version: "3"
+version: '3'
 services:
   mysql:
     container_name: mysql_era
     image: mysql:8.0.20
     restart: always
+    ports:
+      - 3306:3306
     volumes:
       - $PWD/mysql/conf:/etc/mysql
       - $PWD/mysql/data:/var/lib/mysql
-    ports:
-      - 3306:3306
     networks:
       - net_db
     environment:
       - MYSQL_ROOT_PASSWORD=Root123456
-    command: ['--default-authentication-plugin=mysql_native_password']
+    command:
+      - '--default-authentication-plugin=mysql_native_password'
 
   redis:
     container_name: redis_era
     image: redis:6.0.3
     restart: always
+    ports:
+      - 6379:6379
     volumes:
       - $PWD/redis/conf:/etc/redis
       - $PWD/redis/data:/data
-    ports:
-      - 6379:6379
     networks:
       - net_cache
-    command: ['redis-server', '/etc/redis/redis.conf']
+    command:
+      - 'redis-server'
+      - '/etc/redis/redis.conf'
 
   zookeeper:
     container_name: zookeeper_era
     image: zookeeper:3.6.1
     restart: always
-    volumes:
-      - $PWD/zookeeper/conf/zoo.cfg:/conf/zoo.cfg
     ports:
       - 2181:2181
+    volumes:
+      - $PWD/zookeeper/conf/zoo.cfg:/conf/zoo.cfg
     networks:
       - net_ns
 
@@ -67,11 +70,11 @@ services:
     container_name: rmqnamesrv_era
     image: foxiswho/rocketmq:4.7.0
     restart: always
+    ports:
+      - 9876:9876
     volumes:
       - $PWD/rocketmq/namesrv/store:/opt/store
       - $PWD/rocketmq/namesrv/logs:/opt/logs
-    ports:
-      - 9876:9876
     networks:
       - net_mq
     environment:
@@ -85,13 +88,13 @@ services:
     container_name: rmqbroker_era
     image: foxiswho/rocketmq:4.7.0
     restart: always
+    ports:
+      - 10909:10909
+      - 10911:10911
     volumes:
       - $PWD/rocketmq/broker/conf/broker.conf:/etc/rocketmq/broker.conf
       - $PWD/rocketmq/broker/store:/opt/store
       - $PWD/rocketmq/broker/logs:/opt/logs
-    ports:
-      - 10909:10909
-      - 10911:10911
     networks:
       - net_mq
     environment:
