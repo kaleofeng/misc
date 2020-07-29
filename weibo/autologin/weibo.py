@@ -20,6 +20,7 @@ class Weibo(object):
         self.pubkey = None
         self.rsakv = None
 
+        self.proxies = {}
         self.headers = {}
         self.sid = 0
 
@@ -31,31 +32,40 @@ class Weibo(object):
         self.initParams()
 
     def initParams(self):
+        self.proxies = {
+            'http': 'http://127.0.0.1:8866/',
+            'https': 'http://127.0.0.1:8866/'
+        }
         self.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
 
     def login(self, username, password):
         self.username = username
         self.password = password
 
+        self.session = requests.Session()
+        #self.session.verify = False
+        #self.session.proxies = self.proxies
+        self.session.headers = self.headers
+
         # 预登录
         su = util.encodeUsername(self.username)
         url = r'https://login.sina.com.cn/sso/prelogin.php?entry=weibo&callback=sinaSSOController.preloginCallBack&su=%s&rsakt=mod&checkpin=1&client=ssologin.js(v1.4.19)' %(su)
-        rsp = requests.get(url, headers = self.headers).text
-        
-        # print('--- prelogin url ---', url, '\n')
-        # print('--- prelogin rsp ---', rsp, '\n')
+        rsp = self.session.get(url, headers=self.headers).text
+
+        # print('--- prelogin url ---', url, '\n', flush=True)
+        # print('--- prelogin rsp ---', rsp, '\n', flush=True)
 
         jstring = re.findall(r'\((\{.*?\})\)', rsp)[0]
         preRspData = json.loads(jstring)
 
-        print('--- prelogin rsp data ---', preRspData, '\n')
+        print('--- prelogin rsp data ---', preRspData, '\n', flush=True)
 
         # 验证码
         pcid = preRspData['pcid']
         url = r'https://login.sina.com.cn/cgi/pin.php?r=69631672&s=0&p=%s' %(pcid)
         webbrowser.open_new_tab(url)
-        
-        print('--- login captcha url ---', url, '\n')
+
+        print('--- login captcha url ---', url, '\n', flush=True)
 
         self.servertime = preRspData["servertime"]
         self.nonce = preRspData["nonce"]
@@ -67,23 +77,21 @@ class Weibo(object):
         loginReqData['pcid'] = preRspData['pcid']
         loginReqData['door'] = input('Input captcha of url above in browser: ')
 
-        # print('--- login req headers ---', self.headers, '\n')
-        # print('--- login req data ---', loginReqData, '\n')
-
-        self.session = requests.Session()
+        # print('--- login req headers ---', self.headers, '\n', flush=True)
+        # print('--- login req data ---', loginReqData, '\n', flush=True)
 
         url = r'https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.19)'
-        rsp = self.session.post(url, data = loginReqData, headers = self.headers)
+        rsp = self.session.post(url, data=loginReqData, headers=self.headers)
 
-        # print('--- login session cookies ---', session.cookies, '\n')
-        # print('--- login rsp status ---', rsp.status_code, '\n')
-        # print('--- login rsp headers ---', rsp.headers, '\n')
-        # print('--- login rsp content ---', rsp.content, '\n')
+        # print('--- login session cookies ---', session.cookies, '\n', flush=True)
+        # print('--- login rsp status ---', rsp.status_code, '\n', flush=True)
+        # print('--- login rsp headers ---', rsp.headers, '\n', flush=True)
+        # print('--- login rsp content ---', rsp.content, '\n', flush=True)
 
         jstring = rsp.content.decode('utf-8')
         loginRspData = json.loads(jstring)
 
-        print('--- login rsp data ---', loginRspData, '\n')
+        print('--- login rsp data ---', loginRspData, '\n', flush=True)
 
         # 登录失败
         if loginRspData['retcode'] != '0':
@@ -92,12 +100,12 @@ class Weibo(object):
 
         # 跨域处理
         for crossUrl in loginRspData['crossDomainUrlList']:
-            rsp = self.session.get(crossUrl, headers = self.headers)
+            rsp = self.session.get(crossUrl, headers=self.headers)
 
-            # print('--- cross session cookies ---', session.cookies, '\n')
-            # print('--- cross rsp status ---', rsp.status_code, '\n')
-            # print('--- cross rsp headers ---', rsp.headers, '\n')
-            # print('--- cross rsp content ---', rsp.content, '\n')
+            # print('--- cross session cookies ---', session.cookies, '\n', flush=True)
+            # print('--- cross rsp status ---', rsp.status_code, '\n', flush=True)
+            # print('--- cross rsp headers ---', rsp.headers, '\n', flush=True)
+            # print('--- cross rsp content ---', rsp.content, '\n', flush=True)
 
         self.sid = loginRspData['uid']
         self.state = True
@@ -131,13 +139,12 @@ class Weibo(object):
             '_t': 0
         }
 
-        # print('--- post req data ---', data, '\n')
+        # print('--- post req data ---', data, '\n', flush=True)
 
-        rsp = self.session.post(url, data = data, headers = self.headers)
+        rsp = self.session.post(url, data=data, headers=self.headers)
+        self.code = util.responseCode(rsp.text)
 
-        self.code = int(re.findall('code":"(.*?)"', rsp.text)[0])
-
-        print('--- post rsp code ---', rsp.status_code, self.code, '\n')
+        print('--- post rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def follow(self, uid):
@@ -162,13 +169,12 @@ class Weibo(object):
             '_t': 0
         }
 
-        # print('--- follow req data ---', data, '\n')
+        # print('--- follow req data ---', data, '\n', flush=True)
 
-        rsp = self.session.post(url, data = data, headers = self.headers)
+        rsp = self.session.post(url, data=data, headers=self.headers)
+        self.code = util.responseCode(rsp.text)
 
-        self.code = int(re.findall('code":"(.*?)"', rsp.text)[0])
-
-        print('--- follow rsp code ---', rsp.status_code, self.code, '\n')
+        print('--- follow rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def like(self, mid):
@@ -189,13 +195,12 @@ class Weibo(object):
             '_t': 0
         }
 
-        # print('--- like req data ---', data, '\n')
+        # print('--- like req data ---', data, '\n', flush=True)
 
-        rsp = self.session.post(url, data = data, headers = self.headers)
+        rsp = self.session.post(url, data=data, headers=self.headers)
+        self.code = util.responseCode(rsp.text)
 
-        self.code = int(re.findall('code":"(.*?)"', rsp.text)[0])
-
-        print('--- like rsp code ---', rsp.status_code, self.code, '\n')
+        print('--- like rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def comment(self, mid, content, forward):
@@ -218,13 +223,12 @@ class Weibo(object):
             '_t': 0
         }
 
-        # print('--- comment req data ---', data, '\n')
+        # print('--- comment req data ---', data, '\n', flush=True)
 
-        rsp = self.session.post(url, data = data, headers = self.headers)
+        rsp = self.session.post(url, data=data, headers=self.headers)
+        self.code = util.responseCode(rsp.text)
 
-        self.code = int(re.findall('code":"(.*?)"', rsp.text)[0])
-
-        print('--- comment rsp code ---', rsp.status_code, self.code, '\n')
+        print('--- comment rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def forward(self, mid, content, comment):
@@ -256,13 +260,12 @@ class Weibo(object):
             '_t': 0
         }
 
-        # print('--- forward req data ---', data, '\n')
+        # print('--- forward req data ---', data, '\n', flush=True)
 
-        rsp = self.session.post(url, data = data, headers = self.headers)
+        rsp = self.session.post(url, data=data, headers=self.headers)
+        self.code = util.responseCode(rsp.text)
 
-        self.code = int(re.findall('code":"(.*?)"', rsp.text)[0])
-
-        print('--- forward rsp code ---', rsp.status_code, self.code, '\n')
+        print('--- forward rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def ilike(self, rmid, iuid, imid):
@@ -282,13 +285,12 @@ class Weibo(object):
             '_t': 0
         }
 
-        # print('--- ilike req data ---', data, '\n')
+        # print('--- ilike req data ---', data, '\n', flush=True)
 
-        rsp = self.session.post(url, data = data, headers = self.headers)
+        rsp = self.session.post(url, data=data, headers=self.headers)
+        self.code = util.responseCode(rsp.text)
 
-        self.code = int(re.findall('code":"(.*?)"', rsp.text)[0])
-
-        print('--- ilike rsp code ---', rsp.status_code, self.code, '\n')
+        print('--- ilike rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def icomment(self, ruid, rmid, iuid, imid, content):
@@ -320,21 +322,15 @@ class Weibo(object):
             '_t': 0
         }
 
-        # print('--- icomment req data ---', data, '\n')
+        # print('--- icomment req data ---', data, '\n', flush=True)
 
-        rsp = self.session.post(url, data = data, headers = self.headers)
+        rsp = self.session.post(url, data=data, headers=self.headers)
+        self.code = util.responseCode(rsp.text)
 
-        self.code = int(re.findall('code":"(.*?)"', rsp.text)[0])
-
-        print('--- icomment rsp code ---', rsp.status_code, self.code, '\n')
+        print('--- icomment rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
-        
+
     def tfollow(self, tid):
-        home = r'https://weibo.com/p/100808%s/super_index' %(tid)
-        rsp = self.session.get(home, headers = self.headers)
-
-        print('--- tfollow rsp ---', rsp, '\n')
-
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/proxy?ajwvr=6&__rnd=%s' %(timestamp)
 
@@ -343,7 +339,7 @@ class Weibo(object):
 
         data = {
             'uid': self.sid,
-            'objectid': r'1022%%3A100808%s' %(tid),
+            'objectid': r'1022:100808%s' %(tid),
             'f': 1,
             'extra': '',
             'refer_sort': '',
@@ -354,30 +350,32 @@ class Weibo(object):
             'nogroup': 1,
             'fnick': '',
             'template': 4,
-            'isinterest': True,
-            'api': 'http%3A%2F%2Fi.huati.weibo.com%2Faj%2Fsuperfollow',
+            'isinterest': 'true',
+            'api': 'http://i.huati.weibo.com/aj/superfollow',
             'pageid': r'100808%s' %(tid),
             'reload': 1,
             '_t': 0
         }
 
-        print('--- tfollow req data ---', data, '\n')
+        #print('--- tfollow req data ---', data, '\n', flush=True)
 
-        rsp = self.session.post(url, data = data, headers = self.headers)
+        rsp = self.session.post(url, data=data, headers=self.headers)
 
-        self.code = int(re.findall('code":"(.*?)"', rsp.text)[0])
+        print('--- tfollow rsp ---', rsp, '\n', flush=True)
 
-        print('--- tfollow rsp code ---', rsp.status_code, self.code, '\n')
-        print('--- tfollow rsp code ---', rsp.text, '\n')
+        self.code = util.responseCode(rsp.text)
+
+        print('--- tfollow rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
-        
+
     def tsignin(self, tid):
         timestamp = int(time.time()) * 1000
-        url = r'https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=%s&location=page_100808_super_index&__rnd=%s' %(tid, timestamp)
+        url = r'https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=100808' + tid + r'&location=page_100808_super_index&timezone=GMT+0800&lang=zh-cn&plat=Win32&ua=Mozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64;%20rv:79.0)%20Gecko/20100101%20Firefox/79.0&screen=1080*1920&__rnd=' + str(timestamp)
 
         self.headers['Referer'] = r'https://weibo.com/p/100808%s/super_index' %(tid)
 
-        rsp = session.get(url, headers = self.headers)
+        rsp = self.session.get(url, headers=self.headers)
+        self.code = util.responseCode(rsp.text)
 
-        print('--- tsignin rsp code ---', rsp.status_code, self.code, '\n')
+        print('--- tsignin rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self

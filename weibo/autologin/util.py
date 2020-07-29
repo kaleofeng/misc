@@ -24,7 +24,7 @@ def encodePassword(password, servertime, nonce, pubkey):
 def encodePostData(username, password, servertime, nonce, pubkey, rsakv):
     su = encodeUsername(username)
     sp = encodePassword(password, servertime, nonce, pubkey)
-    
+
     postData = {
         "cdult": "3",
         "domain": "sina.com.cn",
@@ -52,3 +52,12 @@ def encodePostData(username, password, servertime, nonce, pubkey, rsakv):
 def randomText(length):
     text = ''.join(random.sample(string.ascii_letters + string.digits, length))
     return text
+
+def responseCode(text):
+    codes = re.findall('code":"(\d*?)"', text)
+    if len(codes) > 0:
+        return int(codes[0])
+    codes = re.findall('code":(\d*?)[,}]', text)
+    if len(codes) > 0:
+        return int(codes[0])
+    return -1
