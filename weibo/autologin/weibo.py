@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import io
 import json
 import os
 import re
 import requests
+import sys
 import time
 import webbrowser
 
@@ -50,12 +52,12 @@ class Weibo(object):
         # 预登录
         su = util.encodeUsername(self.username)
         url = r'https://login.sina.com.cn/sso/prelogin.php?entry=weibo&callback=sinaSSOController.preloginCallBack&su=%s&rsakt=mod&checkpin=1&client=ssologin.js(v1.4.19)' %(su)
-        rsp = self.session.get(url, headers=self.headers).text
+        rsp = self.session.get(url, headers=self.headers)
 
         # print('--- prelogin url ---', url, '\n', flush=True)
         # print('--- prelogin rsp ---', rsp, '\n', flush=True)
 
-        jstring = re.findall(r'\((\{.*?\})\)', rsp)[0]
+        jstring = re.findall(r'\((\{.*?\})\)', rsp.text)[0]
         preRspData = json.loads(jstring)
 
         print('--- prelogin rsp data ---', preRspData, '\n', flush=True)
@@ -415,10 +417,60 @@ class Weibo(object):
             '_t': 0
         }
 
-        # print('--- post req data ---', data, '\n', flush=True)
+        #print('--- tpost req data ---', data, '\n', flush=True)
 
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- post rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('--- tpost rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        return self
+
+    def tcomment(self, tid, mid, content, forward):
+        wtid = r'100808%s' %(tid)
+        timestamp = int(time.time()) * 1000
+        url = r'https://weibo.com/aj/v6/comment/add?ajwvr=6&__rnd=%s' %(timestamp)
+
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(wtid)
+
+        data = {
+            'act': 'post',
+            'mid': mid,
+            'uid': self.sid,
+            'forward': forward,
+            'isroot': 0,
+            'content': content,
+            'location': 'page_100808_super_index',
+            'module': 'scommlist',
+            'group_source': '',
+            'filter_actionlog': '',
+            'pdetail': wtid,
+            '_t': 0
+        }
+
+        # print('--- comment req data ---', data, '\n', flush=True)
+
+        rsp = self.session.post(url, data=data, headers=self.headers)
+        self.code = util.responseCode(rsp.text)
+
+        print('--- tcomment rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        return self
+
+    def tlao(self, tid, content, number):
+        wtid = r'100808%s' %(tid)
+        url = r'https://weibo.com/p/%s/super_index' %(wtid)
+
+        rsp = self.session.get(url, headers=self.headers)
+
+        mids = re.findall(r'mid=\\"(\d*?)\\"', rsp.text)
+
+        print('--- tlao rsp mids ---', mids, '\n', flush=True)
+
+        count = 0
+        for mid in mids:
+            self.tcomment(tid, mid, content, 0)
+            count += 1
+            if count >= number:
+              break
+
+        self.code = 100000
         return self
