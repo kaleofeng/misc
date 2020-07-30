@@ -8,7 +8,6 @@
 
     "tasks": {
         "tis": [
-
             {
                 "tid": "b9f65c4f1d30610361ee306a94e61171"
             },
@@ -22,7 +21,18 @@
         "tps": [
             {
                 "tid": "7c8f5355e8346646024f8354b57238bf",
-                "content": "#越靓[超话]# 这是要发布的内容"
+                "content": "#越靓[超话]# 这是要发布的内容，无图",
+                "picture": "6931005dgy1gh975yiyndg20fd0g0u0z"
+            },
+            {
+                "tid": "7c8f5355e8346646024f8354b57238bf",
+                "content": "#越靓[超话]# 这是要发布的内容，单图",
+                "picture": "6931005dgy1gh975yiyndg20fd0g0u0z"
+            },
+            {
+                "tid": "7c8f5355e8346646024f8354b57238bf",
+                "content": "#越靓[超话]# 这是要发布的内容，多图",
+                "picture": "6931005dgy1gh97k2bg5sj20u0190ab5|6931005dgy1gh97k4mc2oj20u0190dgp"
             }
         ]
     }

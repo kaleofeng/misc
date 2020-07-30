@@ -99,12 +99,12 @@ def doTSignIn(client, tid):
 
     return ret
 
-def doTPost(client, tid, content):
-    print('doTPost', tid, content, '\n', flush = True)
+def doTPost(client, tid, content, picture):
+    print('doTPost', tid, content, picture, '\n', flush = True)
 
-    client.tpost(tid, content)
+    client.tpost(tid, content, picture)
     ret = client.code == 100000
     if not ret:
-        print('!!! doTPost failed !!!', tid, content, '\n', flush = True)
+        print('!!! doTPost failed !!!', tid, content, picture, '\n', flush = True)
 
     return ret

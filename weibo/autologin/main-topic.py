@@ -30,7 +30,8 @@ def doBatch(tasks, username, password):
     for tp in tps:
         tid = tp['tid']
         content = tp['content']
-        helper.doTPost(client, tid, content)
+        picture = tp['picture']
+        helper.doTPost(client, tid, content, picture)
         time.sleep(3)
 
     print('doBatch end: ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '\n', flush = True)

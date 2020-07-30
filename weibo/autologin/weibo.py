@@ -379,7 +379,7 @@ class Weibo(object):
         print('--- tsignin rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
 
-    def tpost(self, tid, content):
+    def tpost(self, tid, content, picture):
         wtid = r'100808%s' %(tid)
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/p/aj/proxy?ajwvr=6&__rnd=%s' %(timestamp)
@@ -401,7 +401,7 @@ class Weibo(object):
             'text': content,
             'appkey': '',
             'style_type': 1,
-            'pic_id': '',
+            'pic_id': picture,
             'tid': '',
             'pdetail': wtid,
             'mid': '',
