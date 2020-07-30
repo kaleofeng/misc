@@ -1,16 +1,14 @@
 {
     "accounts": [
         {
-            "username": "luanimiesi@sina.cn",
-            "password": "989B00"
+            "username": "test@sina.com.cn",
+            "password": "test123456"
         }
     ],
 
     "tasks": {
         "tis": [
-            {
-                "tid": "2a98366b6a3546bd16e9da0571e34b84"
-            },
+
             {
                 "tid": "b9f65c4f1d30610361ee306a94e61171"
             },
@@ -18,22 +16,13 @@
                 "tid": "7a8941058aaf4df5147042ce104568da"
             },
             {
-                "tid": "09f7530c6cddff14b874ffe681a88bad"
-            },
+                "tid": "7c8f5355e8346646024f8354b57238bf"
+            }
+        ],
+        "tps": [
             {
-                "tid": "7b79816b577f176fdd2f78aff12c1bbf"
-            },
-            {
-                "tid": "8674a28c97c39737d5dde42da6e5a6ba"
-            },
-            {
-                "tid": "237347456f0169aa3c4843505d877bc2"
-            },
-            {
-                "tid": "32fca6359903aed022479b6af98afa46"
-            },
-            {
-                "tid": "c8922754fd0f2ba821918f4e69a04a71"
+                "tid": "7c8f5355e8346646024f8354b57238bf",
+                "content": "#越靓[超话]# 这是要发布的内容"
             }
         ]
     }

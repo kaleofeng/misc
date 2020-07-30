@@ -331,15 +331,16 @@ class Weibo(object):
         return self
 
     def tfollow(self, tid):
+        wtid = r'100808%s' %(tid)
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/proxy?ajwvr=6&__rnd=%s' %(timestamp)
 
         self.headers['Content-Type'] = r'application/x-www-form-urlencoded'
-        self.headers['Referer'] = r'https://weibo.com/p/100808%s/super_index' %(tid)
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(wtid)
 
         data = {
             'uid': self.sid,
-            'objectid': r'1022:100808%s' %(tid),
+            'objectid': r'1022:%s' %(wtid),
             'f': 1,
             'extra': '',
             'refer_sort': '',
@@ -352,7 +353,7 @@ class Weibo(object):
             'template': 4,
             'isinterest': 'true',
             'api': 'http://i.huati.weibo.com/aj/superfollow',
-            'pageid': r'100808%s' %(tid),
+            'pageid': wtid,
             'reload': 1,
             '_t': 0
         }
@@ -360,22 +361,64 @@ class Weibo(object):
         #print('--- tfollow req data ---', data, '\n', flush=True)
 
         rsp = self.session.post(url, data=data, headers=self.headers)
-
-        print('--- tfollow rsp ---', rsp, '\n', flush=True)
-
         self.code = util.responseCode(rsp.text)
 
         print('--- tfollow rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def tsignin(self, tid):
+        wtid = r'100808%s' %(tid)
         timestamp = int(time.time()) * 1000
-        url = r'https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=100808' + tid + r'&location=page_100808_super_index&timezone=GMT+0800&lang=zh-cn&plat=Win32&ua=Mozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64;%20rv:79.0)%20Gecko/20100101%20Firefox/79.0&screen=1080*1920&__rnd=' + str(timestamp)
+        url = r'https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=' + wtid + r'&location=page_100808_super_index&timezone=GMT+0800&lang=zh-cn&plat=Win32&ua=Mozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64;%20rv:79.0)%20Gecko/20100101%20Firefox/79.0&screen=1080*1920&__rnd=' + str(timestamp)
 
-        self.headers['Referer'] = r'https://weibo.com/p/100808%s/super_index' %(tid)
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(wtid)
 
         rsp = self.session.get(url, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
         print('--- tsignin rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        return self
+
+    def tpost(self, tid, content):
+        wtid = r'100808%s' %(tid)
+        timestamp = int(time.time()) * 1000
+        url = r'https://weibo.com/p/aj/proxy?ajwvr=6&__rnd=%s' %(timestamp)
+
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(wtid)
+
+        data = {
+            'id': wtid,
+            'domain': '100808',
+            'module': 'share_topic',
+            'title': '%E5%8F%91%E5%B8%96',
+            'content': '',
+            'api_url': 'http://i.huati.weibo.com/pcpage/super/publisher',
+            'spr': '',
+            'extraurl': '',
+            'is_stock': '',
+            'check_url': 'http%3A%2F%2Fi.huati.weibo.com%2Faj%2Fsuperpublishauth%26pageid%3D' + wtid + '%26uid%3D1764819037',
+            'location': 'page_100808_super_index',
+            'text': content,
+            'appkey': '',
+            'style_type': 1,
+            'pic_id': '',
+            'tid': '',
+            'pdetail': wtid,
+            'mid': '',
+            'isReEdit': 'false',
+            'sync_wb': 0,
+            'pub_source': 'page_2',
+            'api': 'http://i.huati.weibo.com/pcpage/operation/publisher/sendcontent?sign=super&page_id=%s' %(wtid),
+            'longtext': 1,
+            'topic_id': '1022:%s' %(wtid),
+            'pub_type': 'dialog',
+            '_t': 0
+        }
+
+        # print('--- post req data ---', data, '\n', flush=True)
+
+        rsp = self.session.post(url, data=data, headers=self.headers)
+        self.code = util.responseCode(rsp.text)
+
+        print('--- post rsp code ---', rsp.status_code, self.code, '\n', flush=True)
         return self
