@@ -2,7 +2,8 @@
     "accounts": [
         {
             "username": "test@sina.com.cn",
-            "password": "test123456"
+            "password": "test123456",
+            "sid": "1234567890"
         }
     ],
 

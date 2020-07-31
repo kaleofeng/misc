@@ -10,11 +10,11 @@ import util
 import weibo
 import helper
 
-def doBatch(tasks, username, password, oddeven):
+def doBatch(tasks, username, password, sid, oddeven):
     print('doBatch begin: ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '\n', flush=True)
 
     client = weibo.Weibo()
-    client.login(username, password)
+    client.login(username, password, sid)
     if not client.state:
         client.logout()
         return False
@@ -162,8 +162,9 @@ if __name__ == '__main__':
 
         username = account['username']
         password = account['password']
+        sid = account['sid']
 
-        ret = doBatch(config['tasks'], username, password, oddeven)
+        ret = doBatch(config['tasks'], username, password, sid, oddeven)
         if ret:
             print("*** doBatch %s success, well done ***!" %(oddeven), username, password, '\n', flush=True)
         else:

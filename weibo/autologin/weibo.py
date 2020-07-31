@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import http.cookiejar as cookiejar
 import io
 import json
 import os
@@ -13,9 +14,10 @@ import webbrowser
 import util
 
 class Weibo(object):
-    def __init__(self, username = None, password = None):
-        self.username = username
-        self.password = password
+    def __init__(self):
+        self.username = None
+        self.password = None
+        self.sid = 0
 
         self.servertime = None
         self.nonce = None
@@ -24,7 +26,6 @@ class Weibo(object):
 
         self.proxies = {}
         self.headers = {}
-        self.sid = 0
 
         self.session = None
         self.state = False
@@ -40,14 +41,27 @@ class Weibo(object):
         }
         self.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
 
-    def login(self, username, password):
+    def login(self, username, password, sid):
         self.username = username
         self.password = password
+        self.sid = sid
 
         self.session = requests.Session()
         #self.session.verify = False
         #self.session.proxies = self.proxies
         self.session.headers = self.headers
+        self.session.cookies = cookiejar.LWPCookieJar(filename="data/cookies.txt")
+
+        useCookie = True
+        try:
+            self.session.cookies.load(ignore_discard=True, ignore_expires=True)
+        except:
+            useCookie = False
+            print('--- prelogin cookie load failed ---', '\n', flush=True)
+
+        if useCookie:
+            self.state = True
+            return self
 
         # 预登录
         su = util.encodeUsername(self.username)
@@ -111,6 +125,7 @@ class Weibo(object):
 
         self.sid = loginRspData['uid']
         self.state = True
+        self.session.cookies.save(ignore_discard=True, ignore_expires=True)
         return self
 
     def logout(self):
