@@ -52,16 +52,23 @@ class Weibo(object):
         self.session.headers = self.headers
         self.session.cookies = cookiejar.LWPCookieJar(filename="data/cookies.txt")
 
-        useCookie = True
+        # 尝试使用cookie登录
         try:
             self.session.cookies.load(ignore_discard=True, ignore_expires=True)
-        except:
-            useCookie = False
-            print('--- prelogin cookie load failed ---', '\n', flush=True)
+            home = r'https://weibo.com'
+            rsp = self.session.get(home)
 
-        if useCookie:
-            self.state = True
-            return self
+            # print('--- login by cookie rsp ---', rsp, '\n', flush=True)
+
+            uids = re.findall(r"CONFIG\['uid'\]='(\d*?)'", rsp.text)
+            if len(uids) > 0:
+                self.sid = uids[0]
+                self.state = True
+
+                print('Login by cookie success', self.sid, self.state, '\n', flush=True)
+                return self
+        except:
+            print('Login by cookie load failed!', '\n', flush=True)
 
         # 预登录
         su = util.encodeUsername(self.username)
