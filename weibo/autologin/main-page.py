@@ -10,11 +10,9 @@ import util
 import weibo
 import helper
 
-def doBatch(tasks, username, password, sid, oddeven):
-    print('doBatch begin: ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '\n', flush=True)
-
+def doBatch(tasks, username, password, oddeven):
     client = weibo.Weibo()
-    client.login(username, password, sid)
+    client.login(username, password)
     if not client.state:
         client.logout()
         return False
@@ -143,29 +141,27 @@ def doBatch(tasks, username, password, sid, oddeven):
 
     client.logout()
 
-    print('doBatch end: ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '\n', flush=True)
     return True
 
 if __name__ == '__main__':
     oddeven = int(sys.argv[1])
 
-    print('^^^ args ^^^', oddeven, '\n', flush=True)
+    print('Args: ', oddeven, '\n', flush=True)
 
-    cf = open('data/batch.json', 'r', encoding = 'utf-8')
+    cf = open('data/page.json', 'r', encoding = 'utf-8')
     config = json.load(cf)
     cf.close()
 
-    print('$$$ config $$$', config, '\n', flush=True)
+    print('Config: ', config, '\n', flush=True)
 
     for account in config['accounts']:
-        print("&&& account &&&", account, '\n', flush=True)
+        print("Account: ", account, '\n', flush=True)
 
         username = account['username']
         password = account['password']
-        sid = account['sid']
 
-        ret = doBatch(config['tasks'], username, password, sid, oddeven)
-        if ret:
-            print("*** doBatch %s success, well done ***!" %(oddeven), username, password, '\n', flush=True)
-        else:
-            print("!!! doBatch %s failed !!!" %(oddeven), username, password, '\n', flush=True)
+        print('Do Batch begin...', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '\n', flush=True)
+
+        ret = doBatch(config['tasks'], username, password, oddeven)
+
+        print('Do Batch end, result[%s]' %(ret), time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '\n', flush=True)

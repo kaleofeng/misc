@@ -12,11 +12,9 @@ import util
 import weibo
 import helper
 
-def doBatch(tasks, username, password, sid):
-    print('doBatch begin: ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '\n', flush=True)
-
+def doBatch(tasks, username, password):
     client = weibo.Weibo()
-    client.login(username, password, sid)
+    client.login(username, password)
     if not client.state:
         client.logout()
         return False
@@ -44,7 +42,6 @@ def doBatch(tasks, username, password, sid):
         helper.doTPost(client, tid, content, picture)
         time.sleep(3)
 
-    print('doBatch end: ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '\n', flush=True)
     return True
 
 if __name__ == '__main__':
@@ -52,17 +49,16 @@ if __name__ == '__main__':
     with open('data/topic.json', 'r', encoding = 'utf-8') as cf:
       config = json.load(cf)
 
-    print('$$$ config $$$', config, '\n', flush=True)
+    print('Config: ', config, '\n', flush=True)
 
     for account in config['accounts']:
-        print("&&& account &&&", account, '\n', flush=True)
+        print("Account: ", account, '\n', flush=True)
 
         username = account['username']
         password = account['password']
-        sid = account['sid']
 
-        ret = doBatch(config['tasks'], username, password, sid)
-        if ret:
-            print("*** doBatch success, well done ***!", username, password, '\n', flush=True)
-        else:
-            print("!!! doBatch failed !!!", username, password, '\n', flush=True)
+        print('Do Batch begin...', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '\n', flush=True)
+
+        ret = doBatch(config['tasks'], username, password)
+
+        print('Do Batch end, result[%s]' %(ret), time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '\n', flush=True)

@@ -41,10 +41,9 @@ class Weibo(object):
         }
         self.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
 
-    def login(self, username, password, sid):
+    def login(self, username, password):
         self.username = username
         self.password = password
-        self.sid = sid
 
         self.session = requests.Session()
         #self.session.verify = False
@@ -133,6 +132,8 @@ class Weibo(object):
         self.sid = loginRspData['uid']
         self.state = True
         self.session.cookies.save(ignore_discard=True, ignore_expires=True)
+
+        print('Login by account success', self.sid, self.state, '\n', flush=True)
         return self
 
     def logout(self):
@@ -168,7 +169,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- post rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('Post rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def follow(self, uid):
@@ -198,7 +199,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- follow rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('Follow rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def like(self, mid):
@@ -224,7 +225,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- like rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('Like rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def comment(self, mid, content, forward):
@@ -252,7 +253,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- comment rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('Cmment rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def forward(self, mid, content, comment):
@@ -289,7 +290,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- forward rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('Forward rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def ilike(self, rmid, iuid, imid):
@@ -314,7 +315,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- ilike rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('I Like rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def icomment(self, ruid, rmid, iuid, imid, content):
@@ -351,7 +352,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- icomment rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('I Comment rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def tfollow(self, tid):
@@ -387,7 +388,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- tfollow rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('T Follow rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def tsignin(self, tid):
@@ -400,7 +401,7 @@ class Weibo(object):
         rsp = self.session.get(url, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- tsignin rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('T Signin rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def tpost(self, tid, content, picture):
@@ -444,7 +445,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- tpost rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('T Post rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def tcomment(self, tid, mid, content, forward):
@@ -474,7 +475,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('--- tcomment rsp code ---', rsp.status_code, self.code, '\n', flush=True)
+        print('T Comment rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def tlao(self, tid, content, number):
@@ -483,9 +484,11 @@ class Weibo(object):
 
         rsp = self.session.get(url, headers=self.headers)
 
+        #print('--- tlao rsp text ---', rsp.text, '\n', flush=True)
+
         mids = re.findall(r'mid=\\"(\d*?)\\"', rsp.text)
 
-        print('--- tlao rsp mids ---', mids, '\n', flush=True)
+        print('T Lao rsp mids: ', mids, '\n', flush=True)
 
         count = 0
         for mid in mids:
