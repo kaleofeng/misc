@@ -9,8 +9,8 @@ import re
 import requests
 import sys
 import time
-import webbrowser
 
+import captcha
 import util
 
 class Weibo(object):
@@ -86,11 +86,19 @@ class Weibo(object):
 
         # 验证码
         pcid = preRspData['pcid']
-        url = r'https://login.sina.com.cn/cgi/pin.php?r=69631672&s=0&p=%s' %(pcid)
-        webbrowser.open_new_tab(url)
+        captchaUrl = r'https://login.sina.com.cn/cgi/pin.php?r=69631672&s=0&p=%s' %(pcid)
 
-        print('--- login captcha url ---', url, '\n', flush=True)
+        print('--- login captcha url ---', captchaUrl, '\n', flush=True)
 
+        # 本地手动输入验证码
+        captchaText = captcha.identifyLocal(captchaUrl)
+
+        # # 远程人工识别验证码
+        # captchaText = captcha.identifyRemote(captchaUrl)
+
+        print('--- login captcha text ---', captchaText, '\n', flush=True)
+
+        # 其他数据
         self.servertime = preRspData["servertime"]
         self.nonce = preRspData["nonce"]
         self.pubkey = preRspData["pubkey"]
@@ -99,21 +107,20 @@ class Weibo(object):
         # 登录
         loginReqData = util.encodePostData(self.username, self.password, self.servertime, self.nonce, self.pubkey, self.rsakv)
         loginReqData['pcid'] = preRspData['pcid']
-        loginReqData['door'] = input('Input captcha of url above in browser: ')
+        loginReqData['door'] = captchaText
 
-        # print('--- login req headers ---', self.headers, '\n', flush=True)
+        print('--- login req headers ---', self.headers, '\n', flush=True)
         # print('--- login req data ---', loginReqData, '\n', flush=True)
 
         url = r'https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.19)'
         rsp = self.session.post(url, data=loginReqData, headers=self.headers)
 
-        # print('--- login session cookies ---', session.cookies, '\n', flush=True)
+        # print('--- login session cookies ---', self.session.cookies, '\n', flush=True)
         # print('--- login rsp status ---', rsp.status_code, '\n', flush=True)
         # print('--- login rsp headers ---', rsp.headers, '\n', flush=True)
         # print('--- login rsp content ---', rsp.content, '\n', flush=True)
 
-        jstring = rsp.content.decode('utf-8')
-        loginRspData = json.loads(jstring)
+        loginRspData = json.loads(rsp.content)
 
         print('--- login rsp data ---', loginRspData, '\n', flush=True)
 
