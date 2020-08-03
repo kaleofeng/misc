@@ -60,12 +60,14 @@ class Weibo(object):
             # print('--- login by cookie rsp ---', rsp, '\n', flush=True)
 
             uids = re.findall(r"CONFIG\['uid'\]='(\d*?)'", rsp.text)
-            if len(uids) > 0:
-                self.sid = uids[0]
-                self.state = True
+            if len(uids) < 1:
+                raise ValueError
 
-                print('Login by cookie success', self.sid, self.state, '\n', flush=True)
-                return self
+            self.sid = uids[0]
+            self.state = True
+
+            print('Login by cookie success', self.sid, self.state, '\n', flush=True)
+            return self
         except:
             print('Login by cookie load failed!', '\n', flush=True)
 
