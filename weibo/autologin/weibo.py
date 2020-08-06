@@ -365,29 +365,28 @@ class Weibo(object):
         return self
 
     def tfollow(self, tid):
-        wtid = r'100808%s' %(tid)
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/proxy?ajwvr=6&__rnd=%s' %(timestamp)
 
         self.headers['Content-Type'] = r'application/x-www-form-urlencoded'
-        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(wtid)
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(tid)
 
         data = {
             'uid': self.sid,
-            'objectid': r'1022:%s' %(wtid),
+            'objectid': r'1022:%s' %(tid),
             'f': 1,
             'extra': '',
             'refer_sort': '',
             'refer_flag': '',
             'location': 'page_100808_super_index',
-            'oid': tid,
+            'oid': tid[6:],
             'wforce': 1,
             'nogroup': 1,
             'fnick': '',
             'template': 4,
             'isinterest': 'true',
             'api': 'http://i.huati.weibo.com/aj/superfollow',
-            'pageid': wtid,
+            'pageid': tid,
             'reload': 1,
             '_t': 0
         }
@@ -401,11 +400,10 @@ class Weibo(object):
         return self
 
     def tsignin(self, tid):
-        wtid = r'100808%s' %(tid)
         timestamp = int(time.time()) * 1000
-        url = r'https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=' + wtid + r'&location=page_100808_super_index&timezone=GMT+0800&lang=zh-cn&plat=Win32&ua=Mozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64;%20rv:79.0)%20Gecko/20100101%20Firefox/79.0&screen=1080*1920&__rnd=' + str(timestamp)
+        url = r'https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=' + tid + r'&location=page_100808_super_index&timezone=GMT+0800&lang=zh-cn&plat=Win32&ua=Mozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64;%20rv:79.0)%20Gecko/20100101%20Firefox/79.0&screen=1080*1920&__rnd=' + str(timestamp)
 
-        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(wtid)
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(tid)
 
         rsp = self.session.get(url, headers=self.headers)
         self.code = util.responseCode(rsp.text)
@@ -414,14 +412,13 @@ class Weibo(object):
         return self
 
     def tpost(self, tid, content, picture):
-        wtid = r'100808%s' %(tid)
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/p/aj/proxy?ajwvr=6&__rnd=%s' %(timestamp)
 
-        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(wtid)
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(tid)
 
         data = {
-            'id': wtid,
+            'id': tid,
             'domain': '100808',
             'module': 'share_topic',
             'title': '%E5%8F%91%E5%B8%96',
@@ -430,21 +427,21 @@ class Weibo(object):
             'spr': '',
             'extraurl': '',
             'is_stock': '',
-            'check_url': 'http%3A%2F%2Fi.huati.weibo.com%2Faj%2Fsuperpublishauth%26pageid%3D' + wtid + '%26uid%3D1764819037',
+            'check_url': 'http%3A%2F%2Fi.huati.weibo.com%2Faj%2Fsuperpublishauth%26pageid%3D' + tid + '%26uid%3D1764819037',
             'location': 'page_100808_super_index',
             'text': content,
             'appkey': '',
             'style_type': 1,
             'pic_id': picture,
             'tid': '',
-            'pdetail': wtid,
+            'pdetail': tid,
             'mid': '',
             'isReEdit': 'false',
             'sync_wb': 0,
             'pub_source': 'page_2',
-            'api': 'http://i.huati.weibo.com/pcpage/operation/publisher/sendcontent?sign=super&page_id=%s' %(wtid),
+            'api': 'http://i.huati.weibo.com/pcpage/operation/publisher/sendcontent?sign=super&page_id=%s' %(tid),
             'longtext': 1,
-            'topic_id': '1022:%s' %(wtid),
+            'topic_id': '1022:%s' %(tid),
             'pub_type': 'dialog',
             '_t': 0
         }
@@ -458,11 +455,10 @@ class Weibo(object):
         return self
 
     def tcomment(self, tid, mid, content, forward):
-        wtid = r'100808%s' %(tid)
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/v6/comment/add?ajwvr=6&__rnd=%s' %(timestamp)
 
-        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(wtid)
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(tid)
 
         data = {
             'act': 'post',
@@ -475,7 +471,7 @@ class Weibo(object):
             'module': 'scommlist',
             'group_source': '',
             'filter_actionlog': '',
-            'pdetail': wtid,
+            'pdetail': tid,
             '_t': 0
         }
 
@@ -488,8 +484,7 @@ class Weibo(object):
         return self
 
     def tlao(self, tid, content, number):
-        wtid = r'100808%s' %(tid)
-        url = r'https://weibo.com/p/%s/super_index' %(wtid)
+        url = r'https://weibo.com/p/%s/super_index' %(tid)
 
         rsp = self.session.get(url, headers=self.headers)
 
