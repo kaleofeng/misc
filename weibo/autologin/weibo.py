@@ -148,7 +148,7 @@ class Weibo(object):
     def logout(self):
         self.session.close()
 
-    def post(self, content):
+    def post(self, text):
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/mblog/add?ajwvr=6&__rnd=%s' %(timestamp)
 
@@ -156,7 +156,7 @@ class Weibo(object):
 
         data = {
             'location': 'v6_content_home',
-            'text': content,
+            'text': text,
             'appkey': '',
             'style_type': 1,
             'pic_id': '',
@@ -237,7 +237,7 @@ class Weibo(object):
         print('Like rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
-    def comment(self, mid, content, forward):
+    def comment(self, mid, text, forward):
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/v6/comment/add?ajwvr=6&__rnd=%s' %(timestamp)
 
@@ -249,7 +249,7 @@ class Weibo(object):
             'uid': self.sid,
             'forward': forward,
             'isroot': 0,
-            'content': content,
+            'content': text,
             'location': 'v6_content_home',
             'module': 'scommlist',
             'group_source': 'group_all',
@@ -265,7 +265,7 @@ class Weibo(object):
         print('Cmment rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
-    def forward(self, mid, content, comment):
+    def forward(self, mid, text, comment):
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/v6/mblog/forward?ajwvr=6&__rnd=%s' %(timestamp)
 
@@ -278,7 +278,7 @@ class Weibo(object):
             'mid': mid,
             'style_type': 1,
             'mark': '',
-            'reason': content,
+            'reason': text,
             'from_plugin': 0,
             'location': 'v6_content_home',
             'pdetail': '',
@@ -327,7 +327,7 @@ class Weibo(object):
         print('I Like rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
-    def icomment(self, ruid, rmid, iuid, imid, content):
+    def icomment(self, ruid, rmid, iuid, imid, text):
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/v6/comment/add?ajwvr=6&__rnd=%s' %(timestamp)
 
@@ -340,7 +340,7 @@ class Weibo(object):
             'uid': self.sid,
             'forward': 0,
             'isroot': 0,
-            'content': content,
+            'content': text,
             'ouid': iuid,
             'ispower': 1,
             'status_owner_user': ruid,
@@ -364,34 +364,33 @@ class Weibo(object):
         print('I Comment rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
-    def tfollow(self, tid):
+    def hfollow(self, hid):
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/proxy?ajwvr=6&__rnd=%s' %(timestamp)
 
-        self.headers['Content-Type'] = r'application/x-www-form-urlencoded'
-        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(tid)
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(hid)
 
         data = {
             'uid': self.sid,
-            'objectid': r'1022:%s' %(tid),
+            'objectid': r'1022:%s' %(hid),
             'f': 1,
             'extra': '',
             'refer_sort': '',
             'refer_flag': '',
             'location': 'page_100808_super_index',
-            'oid': tid[6:],
+            'oid': hid[6:],
             'wforce': 1,
             'nogroup': 1,
             'fnick': '',
             'template': 4,
             'isinterest': 'true',
             'api': 'http://i.huati.weibo.com/aj/superfollow',
-            'pageid': tid,
+            'pageid': hid,
             'reload': 1,
             '_t': 0
         }
 
-        #print('--- tfollow req data ---', data, '\n', flush=True)
+        #print('--- hfollow req data ---', data, '\n', flush=True)
 
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
@@ -399,11 +398,11 @@ class Weibo(object):
         print('T Follow rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
-    def tsignin(self, tid):
+    def hsignin(self, hid):
         timestamp = int(time.time()) * 1000
-        url = r'https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=' + tid + r'&location=page_100808_super_index&timezone=GMT+0800&lang=zh-cn&plat=Win32&ua=Mozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64;%20rv:79.0)%20Gecko/20100101%20Firefox/79.0&screen=1080*1920&__rnd=' + str(timestamp)
+        url = r'https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=' + hid + r'&location=page_100808_super_index&timezone=GMT+0800&lang=zh-cn&plat=Win32&ua=Mozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64;%20rv:79.0)%20Gecko/20100101%20Firefox/79.0&screen=1080*1920&__rnd=' + str(timestamp)
 
-        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(tid)
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(hid)
 
         rsp = self.session.get(url, headers=self.headers)
         self.code = util.responseCode(rsp.text)
@@ -411,14 +410,14 @@ class Weibo(object):
         print('T Signin rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
-    def tpost(self, tid, content, picture):
+    def hpost(self, hid, text, picture):
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/p/aj/proxy?ajwvr=6&__rnd=%s' %(timestamp)
 
-        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(tid)
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(hid)
 
         data = {
-            'id': tid,
+            'id': hid,
             'domain': '100808',
             'module': 'share_topic',
             'title': '%E5%8F%91%E5%B8%96',
@@ -427,26 +426,26 @@ class Weibo(object):
             'spr': '',
             'extraurl': '',
             'is_stock': '',
-            'check_url': 'http%3A%2F%2Fi.huati.weibo.com%2Faj%2Fsuperpublishauth%26pageid%3D' + tid + '%26uid%3D1764819037',
+            'check_url': 'http%3A%2F%2Fi.huati.weibo.com%2Faj%2Fsuperpublishauth%26pageid%3D' + hid + '%26uid%3D1764819037',
             'location': 'page_100808_super_index',
-            'text': content,
+            'text': text,
             'appkey': '',
             'style_type': 1,
             'pic_id': picture,
             'tid': '',
-            'pdetail': tid,
+            'pdetail': hid,
             'mid': '',
             'isReEdit': 'false',
             'sync_wb': 0,
             'pub_source': 'page_2',
-            'api': 'http://i.huati.weibo.com/pcpage/operation/publisher/sendcontent?sign=super&page_id=%s' %(tid),
+            'api': 'http://i.huati.weibo.com/pcpage/operation/publisher/sendcontent?sign=super&page_id=%s' %(hid),
             'longtext': 1,
-            'topic_id': '1022:%s' %(tid),
+            'topic_id': '1022:%s' %(hid),
             'pub_type': 'dialog',
             '_t': 0
         }
 
-        #print('--- tpost req data ---', data, '\n', flush=True)
+        #print('--- hpost req data ---', data, '\n', flush=True)
 
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
@@ -454,11 +453,11 @@ class Weibo(object):
         print('T Post rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
-    def tcomment(self, tid, mid, content, forward):
+    def hcomment(self, hid, mid, text, forward):
         timestamp = int(time.time()) * 1000
         url = r'https://weibo.com/aj/v6/comment/add?ajwvr=6&__rnd=%s' %(timestamp)
 
-        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(tid)
+        self.headers['Referer'] = r'https://weibo.com/p/%s/super_index' %(hid)
 
         data = {
             'act': 'post',
@@ -466,12 +465,12 @@ class Weibo(object):
             'uid': self.sid,
             'forward': forward,
             'isroot': 0,
-            'content': content,
+            'content': text,
             'location': 'page_100808_super_index',
             'module': 'scommlist',
             'group_source': '',
             'filter_actionlog': '',
-            'pdetail': tid,
+            'pdetail': hid,
             '_t': 0
         }
 
@@ -483,12 +482,12 @@ class Weibo(object):
         print('T Comment rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
-    def tlao(self, tid, content, number):
-        url = r'https://weibo.com/p/%s/super_index' %(tid)
+    def hsalvage(self, hid, text, number):
+        url = r'https://weibo.com/p/%s/super_index' %(hid)
 
         rsp = self.session.get(url, headers=self.headers)
 
-        #print('--- tlao rsp text ---', rsp.text, '\n', flush=True)
+        #print('--- hsalvage rsp text ---', rsp.text, '\n', flush=True)
 
         mids = re.findall(r'mid=\\"(\d*?)\\"', rsp.text)
 
@@ -496,7 +495,7 @@ class Weibo(object):
 
         count = 0
         for mid in mids:
-            self.tcomment(tid, mid, content, 0)
+            self.hcomment(hid, mid, text, 0)
             count += 1
             if count >= number:
               break

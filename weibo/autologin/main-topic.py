@@ -21,25 +21,25 @@ def doBatch(tasks, username, password):
 
     tis = tasks.get('tis', [])
     for ti in tis:
-        tid = ti['tid']
-        helper.doTFollow(client, tid)
-        helper.doTSignIn(client, tid)
+        hid = ti['hid']
+        helper.doHFollow(client, hid)
+        helper.doHSignIn(client, hid)
         time.sleep(3)
 
     tls = tasks.get('tls', [])
     for tl in tls:
-        tid = tl['tid']
-        content = tl['content']
+        hid = tl['hid']
+        text = tl['text']
         number = tl['number']
-        helper.doTLao(client, tid, content, number)
+        helper.doHSalvage(client, hid, text, number)
         time.sleep(3)
 
     tps = tasks.get('tps', [])
     for tp in tps:
-        tid = tp['tid']
-        content = tp['content']
+        hid = tp['hid']
+        text = tp['text']
         picture = tp['picture']
-        helper.doTPost(client, tid, content, picture)
+        helper.doHPost(client, hid, text, picture)
         time.sleep(3)
 
     return True

@@ -9,10 +9,10 @@ import sys
 import util
 import weibo
 
-def doPost(client, content):
-    print('Do Post', content, '\n', flush=True)
+def doPost(client, text):
+    print('Do Post', text, '\n', flush=True)
 
-    client.post(content)
+    client.post(text)
     ret = client.code == 100000
     if not ret:
         print('Do Post failed!', '\n', flush=True)
@@ -79,52 +79,52 @@ def doIComment(client, ruid, rmid, iuid, imid, ics):
 
     return ret
 
-def doTFollow(client, tid):
-    print('Do T Follow', tid, '\n', flush=True)
+def doHFollow(client, hid):
+    print('DO H Follow', hid, '\n', flush=True)
 
-    client.tfollow(tid)
+    client.hfollow(hid)
     ret = client.code == 100000
     if not ret:
-        print('Do T Follow failed!', tid, '\n', flush=True)
+        print('DO H Follow failed!', hid, '\n', flush=True)
 
     return ret
 
-def doTSignIn(client, tid):
-    print('Do T SignIn', tid, '\n', flush=True)
+def doHSignIn(client, hid):
+    print('DO H SignIn', hid, '\n', flush=True)
 
-    client.tsignin(tid)
+    client.hsignin(hid)
     ret = client.code == 100000
     if not ret:
-        print('Do T SignIn failed!', tid, '\n', flush=True)
+        print('DO H SignIn failed!', hid, '\n', flush=True)
 
     return ret
 
-def doTPost(client, tid, content, picture):
-    print('Do T Post', tid, content, picture, '\n', flush=True)
+def doHPost(client, hid, text, picture):
+    print('DO H Post', hid, text, picture, '\n', flush=True)
 
-    client.tpost(tid, content, picture)
+    client.hpost(hid, text, picture)
     ret = client.code == 100000
     if not ret:
-        print('Do T Post failed!', tid, content, picture, '\n', flush=True)
+        print('DO H Post failed!', hid, text, picture, '\n', flush=True)
 
     return ret
 
-def doTComment(client, tid, mid, content, forward):
-    print('Do T Comment', tid, mid, content, forward, '\n', flush=True)
+def doHComment(client, hid, mid, text, forward):
+    print('DO H Comment', hid, mid, text, forward, '\n', flush=True)
 
-    client.tcomment(tid, mid, content, forward)
+    client.hcomment(hid, mid, text, forward)
     ret = client.code == 100000
     if not ret:
-        print('Do T Comment failed!', tid, mid, content, forward, '\n', flush=True)
+        print('DO H Comment failed!', hid, mid, text, forward, '\n', flush=True)
 
     return ret
 
-def doTLao(client, tid, content, number):
-    print('Do T Lao', tid, content, number, '\n', flush=True)
+def doHSalvage(client, hid, text, number):
+    print('DO H Salvage', hid, text, number, '\n', flush=True)
 
-    client.tlao(tid, content, number)
+    client.hsalvage(hid, text, number)
     ret = client.code == 100000
     if not ret:
-        print('Do T Lao failed!', tid, content, number, '\n', flush=True)
+        print('DO H Salvage failed!', hid, text, number, '\n', flush=True)
 
     return ret

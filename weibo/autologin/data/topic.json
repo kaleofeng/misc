@@ -9,43 +9,43 @@
     "tasks": {
         "tis": [
             {
-                "tid": "100808b9f65c4f1d30610361ee306a94e61171",
-                "tname": "TaylorSwift超话"
+                "hid": "100808b9f65c4f1d30610361ee306a94e61171",
+                "hname": "TaylorSwift超话"
             },
             {
-                "tid": "1008087a8941058aaf4df5147042ce104568da",
-                "tname": "周杰伦超话"
+                "hid": "1008087a8941058aaf4df5147042ce104568da",
+                "hname": "周杰伦超话"
             },
             {
-                "tid": "1008087c8f5355e8346646024f8354b57238bf",
-                "tname": "越靓超话"
+                "hid": "100808db06c78d1e24cf708a14ce81c9b617ec",
+                "hname": "测试超话"
             }
         ],
         "tps": [
             {
-                "tid": "1008087c8f5355e8346646024f8354b57238bf",
-                "tname": "越靓超话",
-                "content": "#越靓[超话]# 这是要发布的内容，无图",
+                "hid": "100808db06c78d1e24cf708a14ce81c9b617ec",
+                "hname": "测试超话",
+                "text": "#测试[超话]# 这是要发布的内容，无图",
+                "picture": ""
+            },
+            {
+                "hid": "100808db06c78d1e24cf708a14ce81c9b617ec",
+                "hname": "测试超话",
+                "text": "#测试[超话]# 这是要发布的内容，单图",
                 "picture": "6931005dgy1gh975yiyndg20fd0g0u0z"
             },
             {
-                "tid": "1008087c8f5355e8346646024f8354b57238bf",
-                "tname": "越靓超话",
-                "content": "#越靓[超话]# 这是要发布的内容，单图",
-                "picture": "6931005dgy1gh975yiyndg20fd0g0u0z"
-            },
-            {
-                "tid": "1008087c8f5355e8346646024f8354b57238bf",
-                "tname": "越靓超话",
-                "content": "#越靓[超话]# 这是要发布的内容，多图",
+                "hid": "100808db06c78d1e24cf708a14ce81c9b617ec",
+                "hname": "测试超话",
+                "text": "#测试[超话]# 这是要发布的内容，多图",
                 "picture": "6931005dgy1gh97k2bg5sj20u0190ab5|6931005dgy1gh97k4mc2oj20u0190dgp"
             }
         ],
         "tls": [
             {
-                "tid": "1008087c8f5355e8346646024f8354b57238bf",
-                "tname": "越靓超话",
-                "content": "越来越靓",
+                "hid": "100808db06c78d1e24cf708a14ce81c9b617ec",
+                "hname": "测试超话",
+                "text": "一测一试",
                 "number": 10
             }
         ]
