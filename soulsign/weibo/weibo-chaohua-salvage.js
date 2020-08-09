@@ -6,6 +6,7 @@
 // @loginURL          https://weibo.com
 // @expire            900e3
 // @domain            weibo.com
+// @domain            m.weibo.cn
 // @param             reserved 暂无参数
 // ==/UserScript==
 
@@ -15,15 +16,18 @@ const chaohuas = [
     "hid": "100808db06c78d1e24cf708a14ce81c9b617ec",
     "hname": "测试超话",
     "text": "微博超话\r\n批量捞帖",
-    "number": 3
+    "number": 3,
+    "commentThreshold": -1
   },
   {
     "hid": "1008084b97c8f5ab54d661a331566ab64bf9d6",
     "hname": "趣味测试超话",
     "text": "微博超话\r\n批量捞帖",
-    "number": 3
+    "number": 3,
+    "commentThreshold": 25
   }
 ];
+
 
 // 当前时间戳
 const timestamp = new Date().getTime();
@@ -53,7 +57,9 @@ async function goHome() {
     };
   }
 
-  const result = /CONFIG\['uid'\]='(\d*?)'/.exec(rsp.data);
+  const jstring = JSON.stringify(rsp.data);
+
+  const result = /CONFIG\['uid'\]='(\d*?)'/.exec(jstring);
   if (result == null || result.length < 2) {
     return {
       success: false,
@@ -107,42 +113,83 @@ async function doComment(hid, hname, mid, text, forward) {
   }
 
   return {
-    success: rsp.data.code == '100000',
+    success: rsp.data.code == '100000' || rsp.data.code == '100001',
     msg: `超话回帖[${hname}]: ${rsp.data.code}-${rsp.data.msg}`
   };
 }
 
-async function doSalvage(hid, hname, text, number) {
-  const url = `https://weibo.com/p/${hid}/super_index`;
+async function doSalvage(hid, hname, text, number, commentThreshold) {
+  const url = 'https://m.weibo.cn/api/container/getIndex';
 
-  const rsp = await axios.get(url);
+  let sinceId = 0;
+  const midList = [];
 
-  if (rsp.status != 200) {
-    return {
-      success: false,
-      msg: `超话捞贴: ${rsp.status}-操作失败`
-    };
-  }
+  while (midList.length < number) {
+    const rsp = await axios({
+      url: url,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Origin': 'https://m.weibo.cn',
+        'Referer': 'https://m.weibo.cn'
+      },
+      params: {
+        'containerid': hid + '_-_sort_time',
+        'luicode': '10000011',
+        'lfid': hid,
+        'since_id': sinceId
+      }
+    });
 
-  const reg = /mid=\\"(\d*?)\\"/g;
-  const mids = [];
-  while ((matches = reg.exec(rsp.data)) != null) {
-    mids.push(matches[1]);
-  }
+    if (rsp.status != 200) {
+      return {
+        success: false,
+        msg: `超话捞贴: ${rsp.status}-操作失败`
+      };
+    }
 
-  let count = 0;
-  for (const mid of mids) {
-    if (count >= number) {
+    const jstring = JSON.stringify(rsp.data);
+
+    const sinceIdReg = /"since_id":(\d*?),/g;
+    if ((matches = sinceIdReg.exec(jstring)) != null) {
+      sinceId = matches[1];
+    }
+
+    const midReg = /"mid":"(.*?)"/g;
+    const mids = [];
+    while ((matches = midReg.exec(jstring)) != null) {
+      mids.push(matches[1]);
+    }
+
+    const commentsCountReg = /"comments_count":(\d*?),/g;
+    const commentsCounts = [];
+    while ((matches = commentsCountReg.exec(jstring)) != null) {
+      commentsCounts.push(matches[1]);
+    }
+
+    if (mids.length != commentsCounts.length) {
       break;
     }
 
+    for (let i = 0; i < mids.length; ++i) {
+      const mid  = mids[i];
+      const commentsCount = commentsCounts[i];
+      if (commentThreshold >= 0 && commentsCount < commentThreshold) {
+        midList.push(mid);
+      }
+    }
+  }
+
+  let count = 0;
+  for (const mid of midList) {
     const result = await doComment(hid, hname, mid, text, 0);
     if (!result.success) {
       throw result.msg;
     }
 
     ++count;
-    await sleep(1000);
+    await sleep(3000);
   }
 
   return {
@@ -163,14 +210,15 @@ exports.run = async function(param) {
     const hname = chaohua['hname'];
     const text = chaohua['text'];
     const number = chaohua['number'];
+    const commentThreshold = chaohua['commentThreshold'];
 
-    let result = await doSalvage(hid, hname, text, number);
+    let result = await doSalvage(hid, hname, text, number, commentThreshold);
     if (!result.success) {
       throw result.msg;
     }
 
     ++count;
-    await sleep(1000);
+    await sleep(3000);
   }
 
   return `操作成功: 完成数量[${count}]`;

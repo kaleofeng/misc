@@ -48,7 +48,9 @@ async function goHome() {
     };
   }
 
-  const result = /CONFIG\['uid'\]='(\d*?)'/.exec(rsp.data);
+  const jstring = JSON.stringify(rsp.data);
+
+  const result = /CONFIG\['uid'\]='(\d*?)'/.exec(jstring);
   if (result == null || result.length < 2) {
     return {
       success: false,
@@ -129,7 +131,7 @@ exports.run = async function(param) {
     }
 
     ++count;
-    await sleep(1000);
+    await sleep(3000);
   }
 
   return `操作成功: 完成数量[${count}]`;

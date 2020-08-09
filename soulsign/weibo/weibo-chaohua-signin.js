@@ -82,7 +82,7 @@ exports.run = async function(param) {
     }
 
     ++count;
-    await sleep(1000);
+    await sleep(3000);
   }
 
   return `操作成功: 完成数量[${count}]`;
