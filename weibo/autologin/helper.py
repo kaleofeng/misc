@@ -119,12 +119,12 @@ def doHComment(client, hid, mid, text, forward):
 
     return ret
 
-def doHSalvage(client, hid, text, number):
-    print('DO H Salvage', hid, text, number, '\n', flush=True)
+def doHSalvage(client, hid, text, number, commentThreshold):
+    print('DO H Salvage', hid, text, number, commentThreshold, '\n', flush=True)
 
-    client.hsalvage(hid, text, number)
+    client.hsalvage(hid, text, number, commentThreshold)
     ret = client.code == 100000
     if not ret:
-        print('DO H Salvage failed!', hid, text, number, '\n', flush=True)
+        print('DO H Salvage failed!', hid, text, number, commentThreshold, '\n', flush=True)
 
     return ret

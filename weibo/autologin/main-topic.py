@@ -31,7 +31,8 @@ def doBatch(tasks, username, password):
         hid = tl['hid']
         text = tl['text']
         number = tl['number']
-        helper.doHSalvage(client, hid, text, number)
+        commentThreshold = tl['commentThreshold']
+        helper.doHSalvage(client, hid, text, number, commentThreshold)
         time.sleep(3)
 
     tps = tasks.get('tps', [])

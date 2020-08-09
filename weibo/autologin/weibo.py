@@ -395,7 +395,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('T Follow rsp code: ', rsp.status_code, self.code, '\n', flush=True)
+        print('H Follow rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def hsignin(self, hid):
@@ -407,7 +407,7 @@ class Weibo(object):
         rsp = self.session.get(url, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('T Signin rsp code: ', rsp.status_code, self.code, '\n', flush=True)
+        print('H Signin rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def hpost(self, hid, text, picture):
@@ -450,7 +450,7 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('T Post rsp code: ', rsp.status_code, self.code, '\n', flush=True)
+        print('H Post rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
     def hcomment(self, hid, mid, text, forward):
@@ -479,22 +479,66 @@ class Weibo(object):
         rsp = self.session.post(url, data=data, headers=self.headers)
         self.code = util.responseCode(rsp.text)
 
-        print('T Comment rsp code: ', rsp.status_code, self.code, '\n', flush=True)
+        print('H Comment rsp code: ', rsp.status_code, self.code, '\n', flush=True)
         return self
 
-    def hsalvage(self, hid, text, number):
-        url = r'https://weibo.com/p/%s/super_index' %(hid)
+    def hsalvage(self, hid, text, number, commentThreshold):
+        url = r'https://m.weibo.cn/api/container/getIndex'
 
-        rsp = self.session.get(url, headers=self.headers)
+        sinceId = 0
+        midList = []
+        commentsCountList = []
+        count = 0
 
-        #print('--- hsalvage rsp text ---', rsp.text, '\n', flush=True)
+        while count < number:
+          params = {
+            'containerid': '%s_-_sort_time' %(hid),
+            'luicode': '10000011',
+            'lfid': '%s' %(hid),
+            'since_id': sinceId
+          }
 
-        mids = re.findall(r'mid=\\"(\d*?)\\"', rsp.text)
+          rsp = self.session.get(url, params=params, headers=self.headers)
 
-        print('T Lao rsp mids: ', mids, '\n', flush=True)
+          # print('--- hsalvage rsp text ---', rsp.text, '\n', flush=True)
+
+          sinceIds = re.findall(r'"since_id":(\d*?),', rsp.text)
+          mids = re.findall(r'"mid":"(\d*?)"', rsp.text)
+          commentsCounts = re.findall(r'"comments_count":(\d*?),', rsp.text)
+
+          # print('H Salvage rsp sinceIds: ', sinceIds, '\n', flush=True)
+          # print('H Salvage rsp mids: ', mids, '\n', flush=True)
+          # print('H Salvage rsp commentsCounts: ', commentsCounts, '\n', flush=True)
+
+          sinceIdNumber = len(sinceIds)
+          if len(sinceIds) < 1:
+            # print('--- hsalvage no sinceId ---', sinceIdNumber, '\n', flush=True)
+            break
+
+          sinceId = sinceIds[0]
+
+          midNumber = len(mids)
+          commentsCountNumber = len(commentsCounts)
+          if midNumber != commentsCountNumber or midNumber < 1:
+            # print('--- hsalvage count mismatch ---', midNumber, commentsCountNumber, '\n', flush=True)
+            break
+
+          for i in range(midNumber):
+            mid = mids[i]
+            commentsCount = commentsCounts[i]
+            # print('--- hsalvage mid commentsCount ---', mid, commentsCount, '\n', flush=True)
+
+            if int(commentsCount) < commentThreshold:
+              midList.append(mid)
+              commentsCountList.append(commentsCount)
+
+          count = len(midList)
+
+        # print('H Salvage rsp midList: ', midList, '\n', flush=True)
+        # print('H Salvage rsp commentsCountList: ', commentsCountList, '\n', flush=True)
 
         count = 0
-        for mid in mids:
+        for mid in midList:
             self.hcomment(hid, mid, text, 0)
             count += 1
             if count >= number:
