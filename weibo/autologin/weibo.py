@@ -488,13 +488,12 @@ class Weibo(object):
         sinceId = 0
         midList = []
         commentsCountList = []
-        count = 0
 
-        while count < number:
+        while len(midList) < number:
           params = {
             'containerid': '%s_-_sort_time' %(hid),
             'luicode': '10000011',
-            'lfid': '%s' %(hid),
+            'lfid': hid,
             'since_id': sinceId
           }
 
@@ -528,11 +527,9 @@ class Weibo(object):
             commentsCount = commentsCounts[i]
             # print('--- hsalvage mid commentsCount ---', mid, commentsCount, '\n', flush=True)
 
-            if int(commentsCount) < commentThreshold:
+            if commentThreshold < 0 or int(commentsCount) < commentThreshold:
               midList.append(mid)
               commentsCountList.append(commentsCount)
-
-          count = len(midList)
 
         # print('H Salvage rsp midList: ', midList, '\n', flush=True)
         # print('H Salvage rsp commentsCountList: ', commentsCountList, '\n', flush=True)
