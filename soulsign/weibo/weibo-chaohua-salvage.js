@@ -156,6 +156,10 @@ async function doSalvage(hid, hname, text, number, commentThreshold) {
       sinceId = matches[1];
     }
 
+    if (sinceId == 0) {
+      break;
+    }
+
     const midReg = /"mid":"(.*?)"/g;
     const mids = [];
     while ((matches = midReg.exec(jstring)) != null) {
@@ -175,8 +179,11 @@ async function doSalvage(hid, hname, text, number, commentThreshold) {
     for (let i = 0; i < mids.length; ++i) {
       const mid  = mids[i];
       const commentsCount = commentsCounts[i];
-      if (commentThreshold >= 0 && commentsCount < commentThreshold) {
+      if (commentThreshold < 0 || commentsCount < commentThreshold) {
         midList.push(mid);
+      }
+      if (midList.length >= number) {
+        break;
       }
     }
   }
