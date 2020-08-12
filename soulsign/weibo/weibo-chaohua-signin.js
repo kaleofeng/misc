@@ -10,6 +10,8 @@
 // ==/UserScript==
 
 // 超话列表
+// hid 超话ID
+// hane 超话名称
 const chaohuas = [
   {
     "hid": "100808db06c78d1e24cf708a14ce81c9b617ec",

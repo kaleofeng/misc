@@ -11,6 +11,11 @@
 // ==/UserScript==
 
 // 超话列表
+// hid 超话ID
+// hane 超话名称
+// text 帖子内容
+// number 捞帖数量
+// commentThreshold 帖子评论数量阈值 若帖子评论数已达到该数量则不评论，配置为-1则无该规则
 const chaohuas = [
   {
     "hid": "100808db06c78d1e24cf708a14ce81c9b617ec",
@@ -99,7 +104,7 @@ async function doComment(hid, hname, mid, text, forward) {
       'filter_actionlog': '',
       'pdetail': hid,
       '_t': 0
-  },
+    },
     transformRequest: [function (data) {
       return objectToUrlEncodedParams(data);
     }]
@@ -145,7 +150,7 @@ async function doSalvage(hid, hname, text, number, commentThreshold) {
     if (rsp.status != 200) {
       return {
         success: false,
-        msg: `超话捞贴: ${rsp.status}-操作失败`
+        msg: `超话捞帖: ${rsp.status}-操作失败`
       };
     }
 
@@ -201,7 +206,7 @@ async function doSalvage(hid, hname, text, number, commentThreshold) {
 
   return {
     success: true,
-    msg: `超话捞贴: 完成数量[${count}]`
+    msg: `超话捞帖: 完成数量[${count}]`
   };
 }
 
