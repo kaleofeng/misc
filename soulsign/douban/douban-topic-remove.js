@@ -5,14 +5,15 @@
 // @author            KaleoFeng
 // @loginURL          https://www.douban.com
 // @expire            900e3
+// @grant             cookie
 // @domain            www.douban.com
 // @param             topicID 帖子ID
 // @param             userID 仅删目标用户评论（为空则删除全部）
 // @param             commentOnly 仅删评论保留帖子（为空则删除帖子）
 // ==/UserScript==
 
-// 当前时间戳
-const timestamp = new Date().getTime();
+const origin = 'https://www.douban.com';
+let ck = '';
 
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -24,7 +25,7 @@ function objectToUrlEncodedParams(obj) {
     .join('&');
 }
 
-async function doGetTopicComments(tid, userId) {
+async function doGetTopicDetail(tid, userId) {
   const url = `https://www.douban.com/group/topic/${tid}`;
   const rsp = await axios.get(url);
 
@@ -61,14 +62,14 @@ async function doRemoveComment(tid, cid) {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'X-Requested-With': 'XMLHttpRequest',
-      'Origin': 'https://douban.com',
+      'Origin': origin,
       'Referer': url
     },
     params: {
       'cid': cid
     },
     data: {
-      'ck': '_y6Q',
+      'ck': ck,
       'cid': cid,
       'reason': 'other_reason',
       'other': '不可抗力因素',
@@ -101,11 +102,11 @@ async function doRemoveTopic(tid) {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'X-Requested-With': 'XMLHttpRequest',
-      'Origin': 'https://douban.com',
+      'Origin': origin,
       'Referer': url
     },
     params: {
-      'ck': '_y6Q'
+      'ck': ck
     }
   });
 
@@ -127,7 +128,9 @@ exports.run = async function(param) {
   const userId = param.userID;
   const commentOnly = param.commentOnly;
 
-  let result = await doGetTopicComments(tid, userId);
+  ck = await getCookie(origin, 'ck') || '';
+
+  let result = await doGetTopicDetail(tid, userId);
   if (!result.success) {
     throw result.msg;
   }
@@ -144,7 +147,11 @@ exports.run = async function(param) {
   }
 
   if (commentOnly == '' || commentOnly == '0') {
-    doRemoveTopic(tid);
+    let result = await doRemoveTopic(tid);
+    return result;
+    if (!result.success) {
+      throw result.msg;
+    }
   }
 
   return `操作成功: 目标帖子[${tid}-${userId}-${commentOnly}]`;
