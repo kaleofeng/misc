@@ -39,7 +39,8 @@ class Weibo(object):
             'http': 'http://127.0.0.1:8866/',
             'https': 'http://127.0.0.1:8866/'
         }
-        self.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+        self.headers['Referer'] = 'https://weibo.com/'
+        self.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'
 
     def login(self, username, password):
         self.username = username

@@ -12,14 +12,14 @@ import string
 import urllib
 
 def encodeUsername(username):
-    return base64.encodestring(username.encode('utf-8'))[:-1]
+    return base64.encodestring(username.encode('utf-8'))[:-1].decode('utf-8')
 
 def encodePassword(password, servertime, nonce, pubkey):
     rsaKey = int(pubkey, 16)
     rsaPubKey = rsa.PublicKey(rsaKey, 65537)
     codeString = str(servertime) + '\t' + str(nonce) + '\n' + str(password)
     pwd = rsa.encrypt(codeString.encode('utf-8'), rsaPubKey)
-    return binascii.b2a_hex(pwd)
+    return binascii.b2a_hex(pwd).decode('utf-8')
 
 def encodePostData(username, password, servertime, nonce, pubkey, rsakv):
     su = encodeUsername(username)
