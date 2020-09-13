@@ -3,6 +3,6 @@ docker run \
   --restart always  \
   --publish 2181:2181 \
   --volume /data/docker/zookeeper/conf/zoo.cfg:/conf/zoo.cfg \
-  --network zookeeper \
+  --network net_srv \
   --detach \
   zookeeper:3.6.1
