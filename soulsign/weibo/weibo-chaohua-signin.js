@@ -6,13 +6,14 @@
 // @loginURL          https://weibo.com
 // @expire            900e3
 // @domain            weibo.com
+// @domain            cms.metazion.fun
 // @param             reserved 暂无参数
 // ==/UserScript==
 
-// 超话列表
+// 【本地超话列表】
 // hid 超话ID
-// hane 超话名称
-const chaohuas = [
+// hname 超话名称
+let chaohuas = [
   {
     "hid": "100808db06c78d1e24cf708a14ce81c9b617ec",
     "hname": "测试超话"
@@ -28,6 +29,25 @@ const timestamp = new Date().getTime();
 
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+async function fetchData() {
+  const url = `https://cms.metazion.fun/weibo-chaohua-infos`;
+  const rsp = await axios.get(url);
+
+  if (rsp.status != 200) {
+    return {
+      success: false,
+      msg: `拉取数据: ${rsp.status}-操作失败`
+    };
+  }
+
+  chaohuas = rsp.data;
+
+  return {
+    success: true,
+    msg: `拉取数据: 操作成功`,
+  };
 }
 
 async function doSignIn(hid, hname) {
@@ -73,6 +93,15 @@ async function doSignIn(hid, hname) {
 }
 
 exports.run = async function(param) {
+  let result = {};
+
+  // 从云端拉取超话列表，如使用本地数据，请在上面配置【本地超话列表】并注释掉下面4行
+  result = await fetchData();
+  if (!result.success) {
+    throw result.msg;
+  }
+
+  // 执行超话批量签到
   let count = 0;
   for (const chaohua of chaohuas) {
     const hid = chaohua['hid'];
