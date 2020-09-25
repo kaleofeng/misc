@@ -171,7 +171,7 @@ exports.run = async function(param) {
   for (const chaohua of chaohuas) {
     const hid = chaohua['hid'];
     const hname = chaohua['hname'];
-    const text = chaohua['text'];
+    const text = chaohua['text'].replace(/\\r\\n/g, '\r\n');
     const picture = chaohua['picture'];
 
     let result = await doPost(hid, hname, text, picture);
