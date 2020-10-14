@@ -140,10 +140,10 @@ exports.run = async function(param) {
   let result = {};
 
   // 从云端拉取超话列表，如使用本地数据，请在上面配置【本地超话列表】并注释掉下面4行
-  result = await fetchData();
-  if (!result.success) {
-    throw result.msg;
-  }
+  // result = await fetchData();
+  // if (!result.success) {
+  //   throw result.msg;
+  // }
 
   // 进入用户主页
   result = await goHome();
