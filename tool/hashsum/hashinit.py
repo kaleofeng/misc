@@ -101,5 +101,4 @@ def hashInit(dirPath):
 
 if __name__ == '__main__':
     dirPath = sys.argv[1]
-    absPath = os.path.abspath(dirPath)
     hashInit(dirPath)
