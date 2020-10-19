@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import calendar
 import glob
 import exifread
 import hashlib
@@ -43,17 +44,34 @@ def makeDir(dirPath):
   if not pathExists:
     os.mkdir(dirPath)
 
+def utcTimeStringToLocalTimeString(utcTimeString, utcFormat, localFormat):
+  utcTimeStruct = time.strptime(utcTimeString, utcFormat)
+  timestamp = calendar.timegm(utcTimeStruct)
+  localTimeStruct = time.localtime(timestamp)
+  return time.strftime(localFormat, localTimeStruct)
+
+def normalizeExifReadDateTime(dtString):
+  return re.sub(r'^(\d{4}):(\d{2}):(\d{2})(.*)$', r'\g<1>-\g<2>-\g<3>\g<4>', dtString)
+
+def normalizeMediaInfoDateTime(dtString):
+  dt = dtString[-19:]
+  if 'UTC' in dtString:
+    dt = utcTimeStringToLocalTimeString(dt, r'%Y-%m-%d %H:%M:%S', r'%Y-%m-%d %H:%M:%S')
+  return dt
+
 def getImageInfo(filePath):
   info = {}
   with open(filePath, 'rb') as f:
     tags = exifread.process_file(f, details=False)
-    imageDateTime = tags.get('Image DateTime', '0')
+    imageDateTime = tags.get('EXIF DateTimeOriginal', '0')
     if imageDateTime == '0':
-      imageDateTime = tags.get('EXIF DateTimeOriginal', '0')
+      imageDateTime = tags.get('EXIF DateTimeDigitized', '0')
     if imageDateTime != '0':
       imageDateTime = imageDateTime.values
-      imageDateTime = re.sub(r'^(\d{4}):(\d{2}):(\d{2})(.*)$', r'\g<1>-\g<2>-\g<3>\g<4>', imageDateTime)
+      imageDateTime = normalizeExifReadDateTime(imageDateTime)
       info['recordTime'] = imageDateTime
+
+  print(filePath, info['recordTime'])
   return info
 
 def getVideoInfo(filePath):
@@ -65,8 +83,10 @@ def getVideoInfo(filePath):
   if videoDateTime == '0':
     videoDateTime = jdata['tracks'][0].get('tagged_date', '0')
   if videoDateTime != '0':
-    videoDateTime = videoDateTime[4:]
+    videoDateTime = normalizeMediaInfoDateTime(videoDateTime)
     info['recordTime'] = videoDateTime
+
+  print(filePath, info['recordTime'])
   return info
 
 def visitFile(filePath):
