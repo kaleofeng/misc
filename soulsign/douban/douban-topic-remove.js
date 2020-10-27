@@ -124,9 +124,9 @@ async function doRemoveTopic(tid) {
 }
 
 exports.run = async function(param) {
-  const tid = param.topicID;
-  const userId = param.userID;
-  const commentOnly = param.commentOnly;
+  const tid = param.topicID ? param.topicID : '';
+  const userId = param.userID ? param.userID : '';
+  const commentOnly = param.commentOnly ? param.commentOnly : '';
 
   ck = await getCookie(origin, 'ck') || '';
 
