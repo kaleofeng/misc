@@ -137,7 +137,7 @@ services:
 
   nginx:
     container_name: nginx_era
-    image: nginx:1.17.10
+    image: nginx:1.19.3
     restart: always
     ports:
       - 80:80
