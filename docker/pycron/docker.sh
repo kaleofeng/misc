@@ -2,6 +2,6 @@ docker run \
   --name pycron \
   --restart=always \
   --volume $PWD/script:/data/script \
-  --network net_pycron \
+  --network docker_net_pycron \
   --detach \
-  kaleofeng/pycron:0.0.1
+  kaleofeng/pycron:1.0-SNAPSHOT

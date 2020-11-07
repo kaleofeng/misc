@@ -1,7 +1,7 @@
 FROM centos:8
 
 LABEL maintainer="KaleoFeng" \
-  version="0.0.1-SNAPSHOT" \
+  version="1.0-SNAPSHOT" \
   description="Crontab with Python 3 on CentOS 8"
 
 USER root

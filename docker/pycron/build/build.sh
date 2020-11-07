@@ -1,1 +1,1 @@
-docker build -t kaleofeng/pycron:0.0.1 .
+docker build -t kaleofeng/pycron:1.0-SNAPSHOT .
