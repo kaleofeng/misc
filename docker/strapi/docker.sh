@@ -3,7 +3,7 @@ docker run \
   --restart=always \
   --publish 1337:1337 \
   --volume $PWD/app:/srv/app \
-  --network net_strapi \
+  --network net_web \
   --detach \
   --env DATABASE_CLIENT=mysql \
   --env DATABASE_NAME=strapi \

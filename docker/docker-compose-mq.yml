@@ -1,0 +1,61 @@
+version: '3'
+services:
+  rmqnamesrv:
+    container_name: rmqnamesrv_era
+    image: foxiswho/rocketmq:4.7.0
+    restart: always
+    ports:
+      - ${RMQNAMESVR_SERVICE_PORT}:9876
+    volumes:
+      - $PWD/rocketmq/namesrv/store:/opt/store
+      - $PWD/rocketmq/namesrv/logs:/opt/logs
+    networks:
+      - net_mq
+    environment:
+      - 'JAVA_OPTS=-Duser.home=/opt'
+      - 'JAVA_OPT_EXT=-server -Xms128m -Xmx128m'
+    command:
+      - 'sh'
+      - 'mqnamesrv'
+
+  rmqbroker:
+    container_name: rmqbroker_era
+    image: foxiswho/rocketmq:4.7.0
+    restart: always
+    ports:
+      - ${RMQBROKER_VIP_PORT}:10909
+      - ${RMQBROKER_NORMAL_PORT}:10911
+    volumes:
+      - $PWD/rocketmq/broker/conf/broker.conf:/etc/rocketmq/broker.conf
+      - $PWD/rocketmq/broker/store:/opt/store
+      - $PWD/rocketmq/broker/logs:/opt/logs
+    networks:
+      - net_mq
+    environment:
+      - 'JAVA_OPTS=-Duser.home=/opt'
+      - 'JAVA_OPT_EXT=-server -Xms128m -Xmx128m'
+    command:
+      - 'sh'
+      - 'mqbroker'
+      - '-c'
+      - '/etc/rocketmq/broker.conf'
+    depends_on:
+      - rmqnamesrv
+
+  rmqconsole:
+    container_name: rmqconsole_era
+    image: apacherocketmq/rocketmq-console:2.0.0
+    restart: always
+    ports:
+      - ${RMQCONSOLE_HTTP_PORT}:8080
+    networks:
+      - net_mq
+    environment:
+      - 'JAVA_OPTS=-Drocketmq.namesrv.addr=rmqnamesrv_era:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false'
+    depends_on:
+      - rmqnamesrv
+      - rmqbroker
+
+networks:
+  net_mq:
+    driver: bridge

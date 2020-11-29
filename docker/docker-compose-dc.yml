@@ -1,0 +1,38 @@
+version: '3'
+services:
+  mysql:
+    container_name: mysql_era
+    image: mysql:8.0.20
+    restart: always
+    ports:
+      - ${MYSQL_SERVICE_PORT}:3306
+    volumes:
+      - $PWD/mysql/conf:/etc/mysql
+      - $PWD/mysql/data:/var/lib/mysql
+    networks:
+      - net_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    command:
+      - '--default-authentication-plugin=mysql_native_password'
+
+  redis:
+    container_name: redis_era
+    image: redis:6.0.3
+    restart: always
+    ports:
+      - ${REDIS_SERVICE_PORT}:6379
+    volumes:
+      - $PWD/redis/conf:/etc/redis
+      - $PWD/redis/data:/data
+    networks:
+      - net_cache
+    command:
+      - 'redis-server'
+      - '/etc/redis/redis.conf'
+
+networks:
+  net_db:
+    driver: bridge
+  net_cache:
+    driver: bridge

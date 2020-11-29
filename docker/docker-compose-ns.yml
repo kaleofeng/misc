@@ -1,0 +1,42 @@
+version: '3'
+services:
+  zookeeper:
+    container_name: zookeeper_era
+    image: zookeeper:3.6.2
+    restart: always
+    ports:
+      - ${ZOOKEEPER_SERVICE_PORT}:2181
+    volumes:
+      - $PWD/zookeeper/conf/zoo.cfg:/conf/zoo.cfg
+    networks:
+      - net_ns
+
+  etcd:
+    container_name: etcd_era
+    image: bitnami/etcd:3.4.13
+    restart: always
+    ports:
+      - ${ETCD_SERVICE_PORT}:2379
+      - ${ETCD_COMM_PORT}:2380
+    networks:
+      - net_ns
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:${ETCD_SERVICE_PORT}
+
+  nacos:
+    container_name: nacos_era
+    image: nacos/nacos-server:1.4.0
+    restart: always
+    ports:
+      - ${NACOS_SERVICE_PORT}:8848
+    networks:
+      - net_ns
+    environment:
+      - JVM_XMX=128m
+      - JVM_XMS=128m
+      - MODE=standalone
+
+networks:
+  net_ns:
+    driver: bridge
