@@ -1,1 +1,1 @@
-59 23 * * * /usr/bin/python3 /data/script/qmusic/singerstat.py >> /data/script/qmusic/log/singerstat.log 2>&1
+59 23 * * * flock -xn /tmp/singerstat.lock -c 'timeout 5m /usr/bin/python3 /data/script/qmusic/singerstat.py >> /data/script/qmusic/log/singerstat.log 2>&1'
