@@ -1,2 +1,11 @@
-wget https://dl.eff.org/certbot-auto
-chmod +x certbot-auto
+dnf install -y epel-release
+dnf install -y snapd
+systemctl enable --now snapd.socket
+ln -s /var/lib/snapd/snap /snap
+
+exit
+
+sudo snap install core
+sudo snap refresh core
+
+snap install --classic certbot
