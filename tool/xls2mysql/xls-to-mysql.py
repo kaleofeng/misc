@@ -23,30 +23,31 @@ def readFromFile(xlsName, records):
     for i in range(1, nrows):
         row = sheet.row_values(i)
         record = {}
-        record["sid"] = int(row[0])
-        record["sname"] = row[1]
-        record["todayPersons"] = int(row[2])
-        record["totalPersons"] = int(row[3])
-        record["totalAlbums"] = int(row[4])
+        record["album"] = int(row[0])
+        record["sid"] = int(row[1])
+        record["sname"] = row[2]
+        record["todayPersons"] = int(row[3])
+        record["totalPersons"] = int(row[4])
+        record["totalAlbums"] = int(row[5])
         record["time"] = timestamp
         records.append(record)
 
     print("Read from file xls[%s] done" % xlsName)
 
 def writeIntoDB(tableName, records):
-    db = pymysql.connect(host="127.0.0.1", user="root", passwd="123456", db="album", charset="utf8mb4")
+    db = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="album", charset="utf8mb4")
     cursor = db.cursor()
 
     # Write each record
     for record in records:
-        sql = "INSERT INTO %s VALUES(0, '%d', '%s', '%d', '%d', '%d', '%d')" % (tableName, record["sid"], record["sname"], record["todayPersons"], record["totalPersons"], record["totalAlbums"], record["time"])
+        sql = "INSERT INTO %s VALUES(0, '%d', '%d', '%s', '%d', '%d', '%d', '%d')" % (tableName, record["album"], record["sid"], record["sname"], record["todayPersons"], record["totalPersons"], record["totalAlbums"], record["time"])
         try:
             cursor.execute(sql)
             db.commit()
-        except:
+        except Exception as e:
             db.rollback()
-            print("Insert record[%d] error!" % record["sid"])
-    
+            print("Insert record[%d] error!" % record["sid"], e)
+
     db.close()
     print("Write into db table[%s] done" % tableName)
 
