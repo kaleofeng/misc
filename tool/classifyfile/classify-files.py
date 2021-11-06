@@ -16,11 +16,12 @@ import time
 
 from pymediainfo import MediaInfo
 
-specificDir= '.mzs'
-specificName = 'meta'
+specificDir= 'mzout'
+specificNames = [os.path.basename(__file__), '.DS_Store']
+print(specificNames)
 
-extensions = '' # Filter file extensions(for example: 'jpg|mp4|mov'), '' for all extensions
-mode = '0'      # Whether put all date dirs to root directory [0] No [1] yes
+extensions = '' # File extension list, e.g.: 'jpg|mp4|mov', empty for all extensions
+mode = '0'      # Put all date directories to their respective directories or root directory 0:respective 1:root
 
 processedCount = 0
 unprocessedFiles = set()
@@ -98,10 +99,11 @@ def visitFile(filePath):
       info = getVideoInfo(filePath)
   except:
     exceptionalFiles.add(filePath)
+    print('visit file caught exception', sys.exc_info())
   return info
 
 def visitDir(basePath, relativePath):
-  print('-----', basePath, relativePath, '-----', flush=True)
+  print('-----', basePath, relativePath, '-----')
 
   global processedCount
 
@@ -123,6 +125,14 @@ def visitDir(basePath, relativePath):
   for entryName in os.listdir(dirPath):
     result = re.search(r'({})$'.format(extensions), entryName, re.IGNORECASE)
     if result == None:
+      continue
+
+    isSpecific = False
+    for sn in specificNames:
+      if entryName.endswith(sn):
+        isSpecific = True
+        break
+    if isSpecific:
       continue
 
     entryPath = joinPath(dirPath, entryName)
@@ -160,36 +170,34 @@ def visitDir(basePath, relativePath):
       unprocessedFiles.add(sFilePath)
 
   for fileTag, filePathList in fileTagMap.items():
-    print(fileTag, len(filePathList), flush=True)
+    print(fileTag, len(filePathList))
 
     tagMetaPath = joinPath(dirMetaPath, fileTag)
-    print(tagMetaPath, flush=True)
+    print(tagMetaPath)
     makeDir(tagMetaPath)
 
     for filePath in filePathList:
       fileRelatedPattern = re.sub(r'\.(\w+)$', '.*', filePath)
       for fileRelated in glob.glob(fileRelatedPattern):
         fileRelated = normalizePath(fileRelated)
-        print('copy {} to {}'.format(fileRelated, tagMetaPath), flush=True)
+        print('copy {} to {}'.format(fileRelated, tagMetaPath))
         shutil.copy(fileRelated, tagMetaPath)
         unprocessedSet.discard(fileRelated)
         unprocessedFiles.discard(fileRelated)
 
-    print('', flush=True)
+    print('')
 
   if len(unprocessedSet) > 0:
     unprocessedTag = '0'
     tagMetaPath = joinPath(dirMetaPath, unprocessedTag)
-    print(tagMetaPath, flush=True)
+    print(tagMetaPath)
     makeDir(tagMetaPath)
     for unprocessedFile in unprocessedSet:
-        print('copy {} to {}'.format(unprocessedFile, tagMetaPath), flush=True)
+        print('copy {} to {}'.format(unprocessedFile, tagMetaPath))
         shutil.copy(unprocessedFile, tagMetaPath)
 
-  print('', flush=True)
-
 def visitInit(dirPath):
-  print('visit Init: ', dirPath, flush=True)
+  print('visit Init: ', dirPath)
 
   visitDir(dirPath, '')
 
@@ -197,19 +205,37 @@ def visitInit(dirPath):
   print('Done! processed[{}] unprocessed[{}] exceptional[{}]'.format(processedCount, len(unprocessedFiles), len(exceptionalFiles)))
   print('')
 
-  print('Unprocessed Files: ', flush=True)
+  print('Unprocessed Files: ')
   for unprocessedFile in unprocessedFiles:
     print('{}'.format(unprocessedFile))
-  print('', flush=True)
+  print('')
 
-  print('Exceptional Files: ', flush=True)
+  print('Exceptional Files: ')
   for exceptionalFile in exceptionalFiles:
     print('{}'.format(exceptionalFile))
-  print('', flush=True)
+  print('')
 
 if __name__ == '__main__':
-  dirPath = sys.argv[1]
-  extensions = sys.argv[2]
-  mode = sys.argv[3]
+  print("usage: classify-files <target dir> <extensions> <mode>")
+  print("e.g.: classify-files . 'jpg|mp4' 1")
+  print("  target dir 要处理的目标目录，默认为当前目录")
+  print("             Target directory, default current directory")
+  print("  extensions 要处理的文件后缀列表，比如 'jpg|mp4|mov'，为空则处理所有后缀，默认为空")
+  print("             File extension list, e.g.: 'jpg|mp4|mov', empty for all extensions, default empty")
+  print("  mode       将生成的日期目录放到各自目录下还是根目录下, 0:各自目录 1:根目录，默认为0")
+  print("             Put all date directories to their respective directories or root directory 0:respective 1:root, default 0")
+  print("")
+
+  dirPath = '.'
+  extensions = ''
+  mode = '0'
+
+  argc = len(sys.argv)
+  if argc >= 2:
+    dirPath = sys.argv[1]
+  if argc >= 3:
+    extensions = sys.argv[2]
+  if argc >= 4:
+    mode = sys.argv[3]
 
   visitInit(dirPath)
