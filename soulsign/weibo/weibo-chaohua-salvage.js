@@ -72,7 +72,13 @@ async function fetchData() {
 async function goHome() {
   const url = `https://weibo.com`;
 
-  const rsp = await axios.get(url);
+  const rsp = await axios.get(
+    url,
+    {
+      headers: {
+        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+      }
+    });
 
   if (rsp.status != 200) {
     return {
@@ -83,7 +89,7 @@ async function goHome() {
 
   const jstring = JSON.stringify(rsp.data);
 
-  const result = /CONFIG\['uid'\]='(\d*?)'/.exec(jstring);
+  const result = /\\"uid\\":(\d*?),/.exec(jstring);
   if (result == null || result.length < 2) {
     return {
       success: false,
