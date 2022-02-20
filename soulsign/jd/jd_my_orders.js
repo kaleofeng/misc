@@ -1,13 +1,16 @@
 // ==UserScript==
-// @name          京东订单分析
+// @name          京东我的订单
 // @namespace     https://github.com/inu1255/soulsign-chrome
 // @version       1.0.0
 // @author        KaleoFeng
-// @loginURL      https://weibo.com
+// @loginURL      https://jd.com
 // @expire        900e3
 // @domain        *.jd.com
 // @param         reserved 暂无参数
 // ==/UserScript==
+
+// 所有商品列表
+const globalProductList = [];
 
 function sleep(milliseconds) {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -25,6 +28,14 @@ function getRegExpDataList(data, regExp) {
     const dataList = [];
     while ((matches = regExp.exec(data)) != null) {
         dataList.push(matches[1]);
+    }
+    return dataList;
+}
+
+function getRegExpDataListCustom(data, regExp, dataFunc) {
+    const dataList = [];
+    while ((matches = regExp.exec(data)) != null) {
+        dataFunc(matches, dataList)
     }
     return dataList;
 }
@@ -59,9 +70,14 @@ async function parseOrderDetailData(url) {
 
     const detailData = result.data;
 
-    const itemList = getRegExpDataList(detailData, /"p-name"[\s\S]*?item[\s\S]*?title="(.*?)"/g);
-    const priceList = getRegExpDataList(detailData, /f-price[\s\S]*?([.\d]+)/g);
-    if (itemList.length != priceList.length) {
+    const itemList = getRegExpDataListCustom(
+        detailData,
+        /"p-name"[\s\S]*?item[\s\S]*?title="(.*?)"[\s\S]*?f-price[\s\S]*?([.\d]+)[\s\S]*?<td>(\d+)</g,
+        (matches, dataList) => {
+            dataList.push([matches[1], matches[2], matches[3]]);
+        });
+
+    if (itemList.length < 1) {
         return {
             success: false,
             msg: `获取订单详情: 失败-${url}`
@@ -71,8 +87,9 @@ async function parseOrderDetailData(url) {
     const detailList = [];
     for (let i = 0; i < itemList.length; i++) {
         const itemDetail = {};
-        itemDetail.name = itemList[i];
-        itemDetail.price = priceList[i];
+        itemDetail.name = itemList[i][0];
+        itemDetail.price = itemList[i][1];
+        itemDetail.amount = itemList[i][2];
         detailList.push(itemDetail);
     }
 
@@ -88,10 +105,24 @@ async function parseOrderBlockData(data) {
     const orderId = getRegExpOneData(data, /_orderid="(.*?)"/g);
     const dealTime = getRegExpOneData(data, /(?<=dealtime") title="(.*?)"/g);
     const costMoney = getRegExpOneData(data, /"amount">[\s\S]*?([\d.]+?)</g);
-    const itemList = getRegExpDataList(data, /"p-name"[\s\S]*?title="(.*?)"/g);
+    const itemList = getRegExpDataListCustom(
+        data,
+        /"p-name"[\s\S]*?title="(.*?)"[\s\S]*?goods-number">[\s\S]*?\w(\d*)/g,
+        (matches, dataList) => {
+            dataList.push([matches[1], matches[2]]);
+        });
 
-    // 如果同一个订单有多个商品，需要深入订单详情
-    if (itemList.length > 1) {
+    if (itemList.length < 1) {
+        console.log(`获取订单详情: 异常-${orderId}`);
+
+        return {
+            success: true,
+            data: productList
+        };
+    }
+
+    // 如果同一个订单有多个商品或商品数量超过1个，需要深入订单详情
+    if (itemList.length > 1 || parseInt(itemList[0][1]) > 1) {
         const orderDetailUri = getRegExpOneData(data, /(details.+)"/g);
         const result = await parseOrderDetailData(`https://${orderDetailUri}`)
         if (!result.success) {
@@ -102,22 +133,25 @@ async function parseOrderBlockData(data) {
             const productInfo = {};
             productInfo.orderId = orderId;
             productInfo.dealTime = dealTime;
+            productInfo.costMoney = costMoney;
             productInfo.itemName = itemDetail.name;
-            productInfo.costMoney = itemDetail.price;
+            productInfo.itemPrice = itemDetail.price;
+            productInfo.itemAmount = itemDetail.amount;
             productList.push(productInfo);
         }
     } else {
         const productInfo = {};
         productInfo.orderId = orderId;
         productInfo.dealTime = dealTime;
-        productInfo.itemName = itemList[0];
         productInfo.costMoney = costMoney;
+        productInfo.itemName = itemList[0][0];
+        productInfo.itemPrice = costMoney;
+        productInfo.itemAmount = itemList[0][1];
         productList.push(productInfo);
     }
 
-    for (const productInfo of productList) {
-        console.log(`订单ID：${productInfo.orderId} 时间：${productInfo.dealTime} 商品：${productInfo.itemName} 花费：${productInfo.costMoney}`);
-    }
+
+    globalProductList.push.apply(globalProductList, productList);
 
     return {
         success: true,
@@ -168,13 +202,17 @@ async function statYearPageData(uri) {
     // 解析下一页
     const nextPageUri = getRegExpOneData(pageData, /d=(.*)">下一页/g);
     if (nextPageUri.length > 0) {
-        await statYearPageData(nextPageUri);
+        result = await statYearPageData(nextPageUri);
+        if (!result.success) {
+            throw result.msg;
+        }
+
         await sleep(1000);
     }
 
     return {
         success: true,
-        data: result
+        data: result.data
     };
 }
 
@@ -212,10 +250,10 @@ exports.run = async function (param) {
 
     const timeList = result.data;
 
-    // 统计分析每个时间数据
+    // 统计分析每个时间数据，第1个元素为近三个月订单，包含在后续年订单里面，所以跳过
     let count = 0;
-    for (const timeUri of timeList) {
-        let result = await statYearPageData(timeUri);
+    for (let i = 1; i < timeList.length; i++) {
+        let result = await statYearPageData(timeList[i]);
         if (!result.success) {
             throw result.msg;
         }
@@ -223,6 +261,8 @@ exports.run = async function (param) {
         ++count;
         await sleep(2000);
     }
+
+    console.log(JSON.stringify(globalProductList));
 
     return `操作成功: 完成数量[${count}]`;
 };
