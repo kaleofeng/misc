@@ -7,6 +7,7 @@
 // @expire        900e3
 // @domain        *.jd.com
 // @param         reserved 暂无参数
+// @grant         notify
 // ==/UserScript==
 
 // 所有商品列表
@@ -123,7 +124,7 @@ async function parseOrderBlockData(data) {
 
     // 如果同一个订单有多个商品或商品数量超过1个，需要深入订单详情
     if (itemList.length > 1 || parseInt(itemList[0][1]) > 1) {
-        const orderDetailUri = getRegExpOneData(data, /(details.+)"/g);
+        const orderDetailUri = getRegExpOneData(data, /(details.+?)"/g);
         const result = await parseOrderDetailData(`https://${orderDetailUri}`)
         if (!result.success) {
             throw result.msg;
@@ -234,6 +235,8 @@ function parseTimeListData(data) {
 }
 
 exports.run = async function (param) {
+    globalProductList.length = 0;
+
     // 获取初始页数据
     let result = await fetchOrderPageData('1&s=4096');
     if (!result.success) {
@@ -263,6 +266,8 @@ exports.run = async function (param) {
     }
 
     console.log(JSON.stringify(globalProductList));
+    showInNewTab('订单列表', JSON.stringify(globalProductList));
+    notify('执行完成，请查看浏览器新打开标签页面获取数据');
 
     return `操作成功: 完成数量[${count}]`;
 };
