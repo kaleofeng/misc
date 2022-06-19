@@ -7,7 +7,7 @@ LABEL maintainer="KaleoFeng" \
 USER root
 
 ENV TZ Asia/Shanghai
-WORKDIR /data/bin/
+WORKDIR /data/bin
 VOLUME [ "/data/bin" ]
 
 COPY ./entrypoint.sh /
