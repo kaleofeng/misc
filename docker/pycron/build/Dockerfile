@@ -20,6 +20,6 @@ RUN dnf -y module install python36; \
 VOLUME [ "/data/script" ]
 
 COPY ./entrypoint.sh .
-ENTRYPOINT [ "sh", "./entrypoint.sh" ]
+ENTRYPOINT [ "bash", "./entrypoint.sh" ]
 
 CMD [ "/usr/sbin/crond", "-n" ]
