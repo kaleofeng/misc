@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <title>词典文章 | 麦希工具</title>
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    {{template "common_head.html"}}
+    <script src="/static/dictarticle/input.js"></script>
+</head>
+
+<body>
+
+<div class="container my-2 p-2" style="background-color: whitesmoke">
+    <div class="card border-light mb-3">
+        <div class="card-header">项目信息</div>
+        <div class="card-body text-dark">
+            <form action="#" method="post">
+            <div class="d-flex justify-content-between mt-3">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">标题</span>
+                    </div>
+                    <input name="title" class="form-control" id="txt_article_title" placeholder="文章标题" type="text">
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <div class="d-flex">
+                    <label for="txt_article_content">内容</label>
+                </div>
+                <textarea name="content" class="form-control" id="txt_article_content" placeholder="文章内容'" rows="15"></textarea>
+            </div>
+
+            <div class="mt-3">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success" id="btn_submit" type="submit">
+                        生成
+                    </button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        setupMain();
+    });
+</script>
+
+{{template "common_footer.html"}}
+</body>
+
+</html>

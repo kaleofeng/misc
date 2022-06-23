@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <title>{{.title}}</title>
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    {{template "common_head.html"}}
+    <script src="/static/dictarticle/output.js"></script>
+</head>
+
+<body>
+<header class="my-4 py-2 text-center">
+    <h1 class="display-4">
+        {{.title}}
+    </h1>
+</header>
+
+<div class="container my-2 p-2" id="div_content">
+</div>
+
+<script>
+    $('#div_content').html('{{.content}}');
+
+    $(function () {
+        setupMain();
+    });
+</script>
+
+{{template "common_footer.html"}}
+</body>
+
+</html>
