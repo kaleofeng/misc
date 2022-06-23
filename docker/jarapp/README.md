@@ -1,10 +1,10 @@
 # jarapp
 
-Provides java jar app runtime environment
+Provides java app runtime environment
 
 ## Info
 
-+ JDK `openjdk:15.0.1`
++ JDK `openjdk:15`
 + Time Zone `Asia/Shanghai`
 + Volume `/data/bin`
 + Service Port `8080`
