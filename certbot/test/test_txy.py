@@ -24,7 +24,7 @@ class TestProvider(unittest.TestCase):
     def test_operation_record(self):
         record_id = self.provider._create_record(domain, subdomain, validation)
         print('创建解析记录：', record_id)
-        self.assertGreater(record_id, 0)
+        self.assertNotEqual(record_id, '')
 
         record_ids = self.provider._list_record(domain, subdomain)
         print('解析记录列表：', record_ids)

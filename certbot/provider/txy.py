@@ -102,7 +102,7 @@ class Provider:
         """添加一条解析记录."""
 
         record_id = self._create_record(domain, subdomain, value)
-        return record_id > 0
+        return record_id != ''
 
     def delete_all_record(self, domain, subdomain):
         """删除所有相关解析记录."""
@@ -123,7 +123,7 @@ class Provider:
 
         rsp_data = _do_post(self.secret_id, self.secret_key, self.service, self.header, payload, 'CreateRecord')
         if self._check_response_error(rsp_data):
-            return '0'
+            return ''
 
         record_id = rsp_data['Response']['RecordId']
         return record_id
@@ -161,6 +161,6 @@ class Provider:
         if 'Error' in rsp_data['Response']:
             err_code = rsp_data['Response']['Error']['Code']
             err_msg = rsp_data['Response']['Error']['Message']
-            print("Error: 【删除记录】{}:{}".format(err_code, err_msg))
+            print("Error: {}:{}".format(err_code, err_msg))
             return True
         return False
