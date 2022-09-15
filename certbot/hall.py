@@ -3,10 +3,6 @@
 
 import argparse
 import importlib
-import sys
-
-secret_id = r'AKIDXtCKJ4e22sW3B7rQmuUrzvfBTvAF5ey4'
-secret_key = r'yhBZu3oLdkeKSN5YloisOk02qRqmW1IO'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='对选择的域名解析服务商添加或删除解析记录')
