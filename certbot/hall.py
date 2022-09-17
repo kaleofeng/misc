@@ -28,12 +28,12 @@ if __name__ == '__main__':
         help='要认证的主域名')
 
     parser.add_argument(
-        'subdomain',
-        help='要认证的子域名')
+        'complete_domain',
+        help='要认证的完整域名')
 
     parser.add_argument(
-        'validation',
-        help='要验证的文本')
+        'validation_value',
+        help='要设置的验证文本')
 
     args = parser.parse_args()
     print('参数：', args)
@@ -46,15 +46,15 @@ if __name__ == '__main__':
         print('Error: 没有找到域名解析服务商（{}）的驱动程序！'.format(args.provider))
         exit(-1)
 
-    ac_domain = '{}.{}'.format('_acme-challenge', args.subdomain)
+    ac_domain = '{}.{}'.format('_acme-challenge', args.complete_domain)
     subdomain = str.replace(ac_domain, '.' + args.domain, '')
     print('主域名：', args.domain)
     print('子域名：', subdomain)
-    print('验证文本：', args.validation)
+    print('验证文本：', args.validation_value)
 
     if args.opertion == 'add':
         print('添加一条解析记录')
-        result = provider.rcreate_one_record(args.domain, subdomain, args.validation)
+        result = provider.rcreate_one_record(args.domain, subdomain, args.validation_value)
     else:
         print('删除所有相关解析记录')
         result = provider.delete_all_record(args.domain, subdomain)
