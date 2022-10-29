@@ -4,7 +4,7 @@
 // @version      1.0.0
 // @description  微博超话批量发帖
 // @author       KaleoFeng
-// @match        https://weibo.com
+// @match        https://weibo.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=tampermonkey.net
 // @grant        none
 // @require      https://cdn.jsdelivr.net/npm/axios@0.27.2/dist/axios.min.js

@@ -4,7 +4,7 @@
 // @version      1.0.0
 // @description  微博超话批量捞帖
 // @author       KaleoFeng
-// @match        https://weibo.com
+// @match        https://weibo.com/*
 // @connect      m.weibo.cn
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=tampermonkey.net
 // @grant        GM_xmlhttpRequest
