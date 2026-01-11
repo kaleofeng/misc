@@ -1,50 +1,54 @@
 // ==UserScript==
-// @name         剑桥词典清爽页面
+// @name         牛津词典清爽页面
 // @namespace    https://github.com/kaleofeng
 // @version      1.0.0
-// @description  剑桥词典清爽页面
+// @description  隐藏牛津词典页面上的广告及干扰元素
 // @author       KaleoFeng
-// @match        https://www.oxfordlearnersdictionaries.com/*
+// @match        *://*.oxfordlearnersdictionaries.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=tampermonkey.net
 // @grant        none
 // @run-at       document-end
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
-    // 配置：需要隐藏的元素选择器列表
-    const selectorsToHide = [
-        '.responsive_entry_left', // 精确匹配 class="responsive_entry_left"
-        '[class*="am-entry"]', // 匹配 class 包含 “am-entry” 的任何元素
-        '[id^="img"]' // 匹配所有id以“img”开头的元素
-    ];
+    console.log('[牛津词典清爽] 开始执行...');
 
-    // 主函数：查找并隐藏所有匹配选择器的元素
-    function hideElements() {
-        selectorsToHide.forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            if (elements.length > 0) {
-                console.log(`[元素清理] 使用选择器 “${selector}” 找到 ${elements.length} 个元素，正在隐藏。`);
-
-                elements.forEach(el => {
-                    el.style.display = 'none';
-                    // 或者使用更彻底的方式：el.remove();
-                });
-            }
-        });
+    // 1. 环境防御：如果在受限的 iframe 中则不执行任何逻辑
+    if (window.self !== window.top) {
+        return;
     }
 
-    // 1. 页面加载完成后立即执行一次
-    hideElements();
+    // 2. 配置需要隐藏的选择器
+    const selectorsToHide = [
+        '[id^="img"]:not(iframe)', // 匹配 id 以 "img" 开头的元素
+        '[id^="ring"]:not(iframe)', // 匹配 id 以 "ring" 开头的元素
+        '.responsive_entry_left', // 特定 class 元素
+        '[class*="img"]:not(iframe)', // 匹配 class 包含 "img" 的元素
+        '[class*="am-entry"]:not(iframe)', // 匹配 class 包含 "am-entry" 的元素
+        '.top-g-container', // 常见的顶部广告栏
+        'iframe[src*="googleads"]', // 常见的谷歌广告 iframe
+        'iframe[id*="google_ads"]' // 常见的谷歌广告 iframe
+    ];
 
-    // 2. 使用 MutationObserver 监听DOM变化，以处理动态加载的内容[4](@ref)
-    const observer = new MutationObserver(hideElements);
-    observer.observe(document.body, { childList: true, subtree: true });
+    // 3. 使用 CSS 注入而非 JS 轮询
+    // 这种方式性能最高，且不会触发 DOM 操作导致的 postMessage 通信冲突
+    const styleContent = `
+        ${selectorsToHide.join(', ')} {
+            display: none !important;
+        }
+    `;
 
-    // 3. (可选) 对于某些单页应用，可以额外监听路由变化
-    // window.addEventListener('popstate', hideElements);
-    // window.addEventListener('pushState', hideElements);
+    // 4. 将样式注入到 HTML 头部
+    const injectStyle = () => {
+        const style = document.createElement('style');
+        style.textContent = styleContent;
+        (document.head || document.documentElement).appendChild(style);
+    };
 
-    console.log('[元素清理] 脚本已加载并开始监控。');
+    // 执行注入
+    injectStyle();
+
+    console.log('[牛津词典清爽] CSS 策略已注入，已跳过敏感 iframe 环境。');
 })();
